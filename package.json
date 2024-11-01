@@ -1,0 +1,26 @@
+{
+  "name": "lld",
+  "version": "1.0.0",
+  "description": "lld project",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Kevin Yang",
+  "license": "MIT",
+  "keywords": [],
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.8",
+    "axios": "^1.7.7",
+    "csv-parser": "^3.0.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.3",
+    "translate": "^3.0.1",
+    "ts-node": "^10.9.2"
+  }
+}
