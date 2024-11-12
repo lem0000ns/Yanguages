@@ -11,13 +11,16 @@
   "license": "MIT",
   "keywords": [],
   "devDependencies": {
+    "nodemon": "^3.1.7",
     "typescript": "^5.6.3"
   },
   "dependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.8",
     "axios": "^1.7.7",
+    "cors": "^2.8.5",
     "csv-parser": "^3.0.0",
+    "express": "^4.21.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.3",
     "translate": "^3.0.1",
