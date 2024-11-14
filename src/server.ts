@@ -33,7 +33,12 @@ app.get("/", (req, res) => {
 
 const getAPIword = async (diff: string, res) => {
   try {
-    const query = `SELECT * FROM words WHERE diff = '${diff}' ORDER BY RAND() LIMIT 1`;
+    let query = "";
+    if (diff != "") {
+      query = `SELECT * FROM words WHERE diff = '${diff}' ORDER BY RAND() LIMIT 1`;
+    } else {
+      query = `SELECT * FROM words ORDER BY RAND() LIMIT 1`;
+    }
     const [results] = await pool.query<Word[]>(query);
     const words = results.map((result) => ({
       english: result.english,
@@ -70,6 +75,7 @@ app.get("/api/word/hard", (req, res) => getAPIword("hard", res));
 app.get("/api/answers/easy", (req, res) => getAnswers("easy", res));
 app.get("/api/answers/med", (req, res) => getAnswers("med", res));
 app.get("/api/answers/hard", (req, res) => getAnswers("hard", res));
+app.get("/api/word", (req, res) => getAPIword("", res));
 
 app.listen(8080, () => {
   console.log("Server is listening on port 8080");

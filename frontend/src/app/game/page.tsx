@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Diff from "./Configs";
-import Result from "./Result";
+import Diff from "../components/Configs";
+import Result from "../components/Result";
+import Navbar from "../ui/Navbar";
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
@@ -57,7 +58,8 @@ const Game = () => {
   }, [wordInfo]);
 
   return (
-    <div className="flex flex-col space-y-8 mx-auto items-center w-2/3">
+    <div className="flex flex-col space-y-8 mx-auto items-center w-full">
+      <Navbar />
       <div className="mt-4">
         Current difficulty:{" "}
         {diff === "easy" && <span className="text-green-100">{diff}</span>}
@@ -67,15 +69,17 @@ const Game = () => {
       {loading ? (
         <p className="flex justify-center mx-auto mt-8">Loading...</p>
       ) : answered ? (
-        <div className="flex flex-row mx-auto space-x-16 justify-center text-center mt-8 w-1/3">
+        <div className="flex flex-row mx-auto space-x-16 justify-center text-center mt-8 sm:w-1/3 w-2/3">
           {wordInfo.map((word, index) => (
             <div key={index}>
-              {Object.entries(word).map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key}: </strong>
-                  {value}
-                </div>
-              ))}
+              {Object.entries(word).map(([key, value]) =>
+                key != "freq" && key != "diff" ? (
+                  <div key={key}>
+                    <strong>{key}: </strong>
+                    {value}
+                  </div>
+                ) : null
+              )}
             </div>
           ))}
         </div>
