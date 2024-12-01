@@ -10,6 +10,7 @@ const Navlinks = () => {
       <Link href="/">Home</Link>
       <Link href="/diary">Diary</Link>
       <Link href="/game">Game</Link>
+      <Link href="/dict">Dictionary</Link>
     </div>
   );
 };
