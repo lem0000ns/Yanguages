@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const Navlinks = () => {
   return (
-    <div className="md:space-x-16 flex md:flex-row md:space-y-0 flex-col space-y-4">
+    <div className="md:space-x-16 flex md:flex-row md:space-y-0 flex-col space-y-4 items-center">
       <Link href="/">Home</Link>
       <Link href="/diary">Diary</Link>
       <Link href="/game">Game</Link>
@@ -23,10 +23,11 @@ const Navbar = () => {
   };
 
   return (
-    <header className="top-0 bg-black flex-wrap z-[20] mx-auto flex w-2/3 items-center justify-between border-b border-purple p-8">
+    <header className="top-0 bg-black flex-wrap z-[20] mx-auto flex w-full items-center justify-between border-b border-purple p-8">
       <nav className="w-full">
-        <div className="hidden w-full md:flex space-x-32 justify-center mx-auto">
+        <div className="hidden w-2/3 md:flex space-x-32 justify-between items-center mx-auto">
           <Navlinks />
+          <Link href="/login">Login</Link>
         </div>
         <div className="md:hidden">
           <button onClick={toggleNavbar}>
@@ -35,8 +36,9 @@ const Navbar = () => {
         </div>
       </nav>
       {isOpen && (
-        <div className="md:hidden flex flex-col items-center basis-full">
+        <div className="md:hidden flex flex-col items-center basis-full space-y-4">
           <Navlinks />
+          <Link href="/login">Login</Link>
         </div>
       )}
     </header>

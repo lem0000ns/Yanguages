@@ -16,6 +16,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("view-engine", "ejs");
 
 interface Word extends RowDataPacket {
   english: string;
