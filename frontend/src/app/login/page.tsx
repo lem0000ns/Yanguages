@@ -23,8 +23,8 @@ const Page = () => {
       const data = await res.json();
       setMessage(data.message);
     } catch (e) {
-      console.log(`Error: ${e}`);
-      setMessage("Login failed");
+      console.log(e);
+      setMessage("Incorrect username or password");
     }
   };
 
@@ -60,7 +60,11 @@ const Page = () => {
             Login
           </button>
         </form>
-        {message && <p className="mt-2 text-red-200">{message}</p>}
+        {message && message[0] == "S" ? (
+          <p className="mt-2 text-green-200">{message}</p>
+        ) : (
+          <p className="mt-2 text-red-200">{message}</p>
+        )}
         <div className="mt-16 flex flex-col items-center space-y-4">
           <p>No account?</p>
           <a className="border rounded-md p-2" href="/register">

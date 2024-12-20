@@ -40,10 +40,12 @@ passport.use(
         `SELECT * FROM usrs WHERE username = '${username}'`
       );
       if ((<any>result[0]).length == 0) {
+        console.log("Incorrect username");
         return done(null, false, { message: "Incorrect username" });
       }
       const user = result[0];
-      if ((user as any).password != password) {
+      if ((user as any)[0].password != password) {
+        console.log("Incorrect password");
         return done(null, false, { message: "Incorrect password" });
       }
       return done(null, user);
@@ -57,7 +59,7 @@ passport.use(
 // called after successful authentication
 passport.serializeUser((user, done) => {
   console.log("Serializing user");
-  done(null, user.id);
+  done(null, user[0].id);
 });
 
 // used when user makes request
@@ -79,8 +81,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  console.log("Received a POST request to /login");
-  res.json({ message: "Logged in successfully" });
+  res.json({ message: "Successful login" });
 });
 
 app.post("/register", async (req, res) => {
