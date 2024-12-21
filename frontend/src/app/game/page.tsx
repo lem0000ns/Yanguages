@@ -59,7 +59,7 @@ const Game = () => {
 
   return (
     <div className="flex flex-col space-y-8 mx-auto items-center w-full">
-      <Navbar />
+      <Navbar username={sessionStorage.getItem("username")} />
       <div className="mt-4">
         Current difficulty:{" "}
         {diff === "easy" && <span className="text-green-100">{diff}</span>}

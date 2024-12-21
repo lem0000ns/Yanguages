@@ -12,7 +12,9 @@ const Page = () => {
     e.preventDefault();
     console.log(`Username entered: ${username}`);
     console.log(`Password entered: ${password}`);
+
     try {
+      // logging in
       const res = await fetch("http://localhost:8080/login", {
         method: "post",
         headers: {
@@ -22,15 +24,23 @@ const Page = () => {
       });
       const data = await res.json();
       setMessage(data.message);
+      sessionStorage.setItem("username", username);
     } catch (e) {
       console.log(e);
       setMessage("Incorrect username or password");
+      sessionStorage.removeItem("username");
     }
   };
 
   return (
     <>
-      <Navbar />
+      <Navbar
+        username={
+          sessionStorage.getItem("username")
+            ? sessionStorage.getItem("username")
+            : ""
+        }
+      />
       <div className="flex flex-col justify-center items-center mx-auto mt-32">
         <form
           onSubmit={handleSubmit}

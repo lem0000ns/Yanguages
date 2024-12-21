@@ -15,7 +15,11 @@ const Navlinks = () => {
   );
 };
 
-const Navbar = () => {
+interface Props {
+  username: string;
+}
+
+const Navbar = ({ username }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleNavbar = () => {
@@ -27,7 +31,11 @@ const Navbar = () => {
       <nav className="w-full">
         <div className="hidden w-2/3 md:flex space-x-32 justify-between items-center mx-auto">
           <Navlinks />
-          <Link href="/login">Login</Link>
+          {username ? (
+            <Link href="/">{username}</Link>
+          ) : (
+            <Link href="/login">Login</Link>
+          )}
         </div>
         <div className="md:hidden">
           <button onClick={toggleNavbar}>

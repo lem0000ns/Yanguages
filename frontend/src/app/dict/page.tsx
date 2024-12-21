@@ -6,13 +6,13 @@ const Dict = () => {
   const [dictWords, setDictWords] = useState([]);
 
   useEffect(() => {
-    const storedWords = JSON.parse(localStorage.getItem("storedWords"));
+    const storedWords = JSON.parse(sessionStorage.getItem("storedWords"));
     setDictWords(storedWords);
   }, []);
 
   return (
     <div>
-      <Navbar></Navbar>
+      <Navbar username={sessionStorage.getItem("username")} />
       <div className="flex flex-col items-center justify-center mx-auto mt-8 space-y-8">
         <span>
           <b>My personal dictionary: </b>
