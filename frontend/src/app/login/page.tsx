@@ -72,12 +72,14 @@ const Page = () => {
         ) : (
           <p className="mt-2 text-red-200">{message}</p>
         )}
-        <div className="mt-16 flex flex-col items-center space-y-4">
-          <p>No account?</p>
-          <a className="border rounded-md p-2" href="/register">
-            Register
-          </a>
-        </div>
+        {!login && (
+          <div className="mt-16 flex flex-col items-center space-y-4">
+            <p>No account?</p>
+            <a className="border rounded-md p-2" href="/register">
+              Register
+            </a>
+          </div>
+        )}
       </div>
     </>
   );

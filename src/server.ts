@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import mysql, { RowDataPacket } from "mysql2/promise";
 import crypto from "crypto";
 import type { IGetUserAuthInfoRequest } from "./request.js";
+import bcrypt from "bcrypt";
 
 // configuration variables
 const lld_pw = process.env.LLD_PW;
@@ -45,11 +46,17 @@ passport.use(
         return done(null, false, { message: "Incorrect username" });
       }
       const user = result[0];
-      if ((user as any)[0].password != password) {
-        console.log("Incorrect password");
-        return done(null, false, { message: "Incorrect password" });
-      }
-      return done(null, user);
+      bcrypt.compare(password, (user as any)[0].password, (err, result) => {
+        if (err) {
+          console.error("Error comparing passwords:", err);
+          return done(null, false, { message: "Incorrect password" });
+        }
+        if (!result) {
+          console.error("Incorrect password");
+          return done(null, false, { message: "Incorrect passsword" });
+        }
+        return done(null, user);
+      });
     } catch (err) {
       console.error(`Error: ${err}`);
       return done(null, false, { message: err.message });
@@ -89,7 +96,10 @@ app.post("/register", async (req, res) => {
   console.log("Received a POST request to /register");
   try {
     const { username, password } = req.body;
-    const query = `INSERT INTO usrs (username, password, highscore) VALUES ('${username}', '${password}', 0)`;
+    console.log(username);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const query = `INSERT INTO usrs (username, password, highscore) VALUES ('${username}', '${hashedPassword}', 0)`;
     await usr_pool.query(query);
     res.status(200).json({ message: "User registered into database" });
   } catch (e) {
