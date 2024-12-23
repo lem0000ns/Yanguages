@@ -7,6 +7,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { fileURLToPath } from "url";
 import mysql, { RowDataPacket } from "mysql2/promise";
 import crypto from "crypto";
+import type { IGetUserAuthInfoRequest } from "./request.js";
 
 // configuration variables
 const lld_pw = process.env.LLD_PW;
@@ -27,7 +28,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(session({ secret: "secret", resave: false, saveUnitialized: true })); // middleware
+app.use(session({ secret: "secret", resave: false, saveUnitialized: false })); // middleware
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
@@ -95,6 +96,13 @@ app.post("/register", async (req, res) => {
     console.error("Error:", e.message);
     res.status(500).json({ message: "Error registering user" });
   }
+});
+
+app.get("/logout", (req: IGetUserAuthInfoRequest, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+  });
+  res.status(200).json({ message: "Successfully logged out" });
 });
 
 interface Word extends RowDataPacket {

@@ -5,10 +5,11 @@ import React, { useEffect, useState } from "react";
 export default function Home() {
   const [wordInfo, setWordInfo] = useState([""]);
   const [newWord, setNewWord] = useState(true);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     const today = new Date().toDateString();
-    const storedDate = sessionStorage.getItem("dateToday");
+    const storedDate = localStorage.getItem("dateToday");
     if (today != storedDate) {
       fetch(`http://localhost:8080/api/word`)
         .then((response) => {
@@ -19,8 +20,8 @@ export default function Home() {
         })
         .then((data) => {
           setWordInfo(data);
-          sessionStorage.setItem("wordInfo", JSON.stringify(data));
-          sessionStorage.setItem("dateToday", new Date().toDateString());
+          localStorage.setItem("wordInfo", JSON.stringify(data));
+          localStorage.setItem("dateToday", new Date().toDateString());
         })
         .catch((error) => {
           console.error("There was an error retrieving data: ", error);
@@ -31,19 +32,21 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const today = new Date().toDateString();
-    const storedDate = sessionStorage.getItem("dateToday");
+    const storedDate = localStorage.getItem("dateToday");
     if (storedDate === today) {
-      const storedWord = sessionStorage.getItem("wordInfo");
+      const storedWord = localStorage.getItem("wordInfo");
       setWordInfo(JSON.parse(storedWord));
     } else {
       setNewWord(!newWord);
     }
+    const temp = sessionStorage.getItem("username");
+    setUsername(temp);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="w-full">
-      <Navbar username={sessionStorage.getItem("username")} />
+      <Navbar username={username} />
       <div className="flex flex-col items-center justify-center mx-auto mt-8 space-y-8">
         <div>The word of the day is...</div>
         <div className="flex text-center justify-center mx-auto w-1/5">

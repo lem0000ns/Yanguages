@@ -33,7 +33,7 @@ const Page = () => {
 
   return (
     <>
-      <Navbar username={localStorage.getItem("username")} />
+      <Navbar username={""} />
       <div className="flex flex-col justify-center items-center mx-auto mt-32">
         <form
           onSubmit={handleSubmit}

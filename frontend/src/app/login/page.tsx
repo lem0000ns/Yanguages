@@ -5,6 +5,7 @@ import Navbar from "../ui/Navbar";
 
 const Page = () => {
   const [username, setUsername] = useState("");
+  const [login, setLogin] = useState(false);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
@@ -25,22 +26,18 @@ const Page = () => {
       const data = await res.json();
       setMessage(data.message);
       sessionStorage.setItem("username", username);
+      setLogin(true);
     } catch (e) {
       console.log(e);
       setMessage("Incorrect username or password");
       sessionStorage.removeItem("username");
+      setLogin(false);
     }
   };
 
   return (
     <>
-      <Navbar
-        username={
-          sessionStorage.getItem("username")
-            ? sessionStorage.getItem("username")
-            : ""
-        }
-      />
+      <Navbar username={login ? username : ""} />
       <div className="flex flex-col justify-center items-center mx-auto mt-32">
         <form
           onSubmit={handleSubmit}

@@ -32,7 +32,7 @@ const Navbar = ({ username }: Props) => {
         <div className="hidden w-2/3 md:flex space-x-32 justify-between items-center mx-auto">
           <Navlinks />
           {username ? (
-            <Link href="/">{username}</Link>
+            <Link href="/logout">{username}</Link>
           ) : (
             <Link href="/login">Login</Link>
           )}
@@ -46,7 +46,11 @@ const Navbar = ({ username }: Props) => {
       {isOpen && (
         <div className="md:hidden flex flex-col items-center basis-full space-y-4">
           <Navlinks />
-          <Link href="/login">Login</Link>
+          {username ? (
+            <Link href="/logout">{username}</Link>
+          ) : (
+            <Link href="/login">Login</Link>
+          )}
         </div>
       )}
     </header>
