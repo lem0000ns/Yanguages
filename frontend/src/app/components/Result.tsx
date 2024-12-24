@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const Result = ({
   options,
@@ -7,7 +7,17 @@ const Result = ({
   word,
   setAnswered,
   setStreak,
+  lang,
+  diff,
 }) => {
+  const [username, setUsername] = useState(() =>
+    localStorage.getItem("username")
+  );
+
+  useEffect(() => {
+    setUsername(localStorage.getItem("username"));
+  }, []);
+
   return (
     <div>
       <b className="flex justify-center mx-auto">{word}</b>
@@ -24,6 +34,13 @@ const Result = ({
                   setAnswered(
                     `The correct answer was ${wordInfo[0].english}.\nYou answered ${streak} in a row correctly`
                   );
+                  if (username) {
+                    fetch("http://localhost:8080/highscore", {
+                      method: "post",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ lang, diff, streak, username }),
+                    });
+                  }
                   setStreak(0);
                 }
               }}

@@ -39,7 +39,7 @@ export default function Home() {
     } else {
       setNewWord(!newWord);
     }
-    const temp = sessionStorage.getItem("username");
+    const temp = localStorage.getItem("username");
     setUsername(temp);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

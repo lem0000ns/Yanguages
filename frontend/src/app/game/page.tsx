@@ -32,6 +32,11 @@ const Game = () => {
   const [diff, setDiff] = useState("easy");
   const [streak, setStreak] = useState(0);
   const [lang, setLang] = useState("sp");
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    setUsername(localStorage.getItem("username"));
+  }, []);
 
   useEffect(() => {
     fetch(`http://localhost:8080/api/word/${diff}`)
@@ -59,7 +64,7 @@ const Game = () => {
 
   return (
     <div className="flex flex-col space-y-8 mx-auto items-center w-full">
-      <Navbar username={sessionStorage.getItem("username")} />
+      <Navbar username={username} />
       <div className="mt-4">
         Current difficulty:{" "}
         {diff === "easy" && <span className="text-green-100">{diff}</span>}
@@ -91,6 +96,8 @@ const Game = () => {
           word={word}
           setAnswered={setAnswered}
           setStreak={setStreak}
+          lang={lang}
+          diff={diff}
         ></Result>
       )}
       {answered && answered == "Correct!" ? (

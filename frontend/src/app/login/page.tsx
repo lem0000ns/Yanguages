@@ -25,12 +25,12 @@ const Page = () => {
       });
       const data = await res.json();
       setMessage(data.message);
-      sessionStorage.setItem("username", username);
+      localStorage.setItem("username", username);
       setLogin(true);
     } catch (e) {
       console.log(e);
       setMessage("Incorrect username or password");
-      sessionStorage.removeItem("username");
+      localStorage.removeItem("username");
       setLogin(false);
     }
   };

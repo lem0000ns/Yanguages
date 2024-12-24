@@ -16,7 +16,7 @@ const Page = () => {
       // logging out
       const res = await fetch("http://localhost:8080/logout");
       if (res.ok) {
-        sessionStorage.removeItem("username");
+        localStorage.removeItem("username");
         console.log(res.json().message);
         setMessage("Logged out successfully!");
         setLogin(false);
@@ -34,7 +34,7 @@ const Page = () => {
   }, [login, router]);
 
   useEffect(() => {
-    setUsername(sessionStorage.getItem("username"));
+    setUsername(localStorage.getItem("username"));
   }, []);
 
   return (

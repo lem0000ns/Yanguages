@@ -169,6 +169,27 @@ app.get("/api/answers/med", (req, res) => getAnswers("med", res));
 app.get("/api/answers/hard", (req, res) => getAnswers("hard", res));
 app.get("/api/word", (req, res) => getAPIword("", res));
 
+app.post("/highscore", async (req, res) => {
+  try {
+    const { lang, diff, streak, username } = req.body;
+    const result = await usr_pool.query(
+      `SELECT ${lang}_${diff} FROM usrs WHERE username = "${username}"`
+    );
+    const curScore = result[0][0][`${lang}_${diff}`];
+    if (streak > curScore) {
+      await usr_pool.query(
+        `UPDATE usrs SET ${lang}_${diff} = ${streak} WHERE username = "${username}"`
+      );
+      res.status(200).json({ message: "High score successfully updated" });
+    } else {
+      res.status(200).json({ message: "No high score update" });
+    }
+  } catch (e) {
+    console.error("Error updating high score, ", e);
+    res.status(500).json({ message: "Error updating high score" });
+  }
+});
+
 app.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });

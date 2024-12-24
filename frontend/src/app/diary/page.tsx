@@ -5,11 +5,11 @@ import Navbar from "../ui/Navbar";
 
 const Diary = () => {
   const [username, setUsername] = useState(() =>
-    sessionStorage.getItem("username")
+    localStorage.getItem("username")
   );
 
   useEffect(() => {
-    setUsername(sessionStorage.getItem("username"));
+    setUsername(localStorage.getItem("username"));
   }, []);
 
   return (
