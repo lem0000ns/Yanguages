@@ -63,7 +63,7 @@ const Game = () => {
   }, [wordInfo]);
 
   return (
-    <div className="flex flex-col space-y-8 mx-auto items-center w-full">
+    <div className="flex flex-col space-y-8 mx-auto items-center w-full mb-16">
       <Navbar username={username} />
       <div className="mt-4">
         Current difficulty:{" "}

@@ -4,9 +4,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 
 const Diary = () => {
-  const [username, setUsername] = useState(() =>
-    localStorage.getItem("username")
-  );
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));

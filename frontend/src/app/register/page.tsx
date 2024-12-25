@@ -6,28 +6,33 @@ import Navbar from "../ui/Navbar";
 const Page = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(`Username entered: ${username}`);
     console.log(`Password entered: ${password}`);
-    try {
-      const res = await fetch("http://localhost:8080/register", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      if (res.ok) {
-        setMessage("Registration successful!");
-      } else {
-        setMessage("That username is already in use");
+    console.log(`Confirmed Password entered: ${confirmPw}`);
+    if (confirmPw != password) setMessage("Passwords don't match");
+    else {
+      try {
+        const res = await fetch("http://localhost:8080/register", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        });
+        if (res.ok) {
+          setMessage("Registration successful!");
+        } else {
+          setMessage("That username is already in use");
+        }
+      } catch (e) {
+        console.log(`Error: ${e}`);
+        setMessage("Problem occurred upon registration...");
       }
-    } catch (e) {
-      console.log(`Error: ${e}`);
-      setMessage("Problem occurred upon registration...");
     }
   };
 
@@ -56,6 +61,16 @@ const Page = () => {
               className="text-black"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Confirm Password</label>{" "}
+            <input
+              type="password"
+              className="text-black"
+              value={confirmPw}
+              onChange={(e) => setConfirmPw(e.target.value)}
               required
             />
           </div>

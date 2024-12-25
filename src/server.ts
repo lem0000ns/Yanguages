@@ -99,7 +99,7 @@ app.post("/register", async (req, res) => {
     console.log(username);
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const query = `INSERT INTO usrs (username, password, highscore) VALUES ('${username}', '${hashedPassword}', 0)`;
+    const query = `INSERT INTO usrs (username, password) VALUES ('${username}', '${hashedPassword}')`;
     await usr_pool.query(query);
     res.status(200).json({ message: "User registered into database" });
   } catch (e) {
@@ -117,6 +117,15 @@ app.get("/logout", (req: IGetUserAuthInfoRequest, res, next) => {
 
 interface Word extends RowDataPacket {
   english: string;
+}
+
+interface Score extends RowDataPacket {
+  sp_easy: number;
+  sp_med: number;
+  sp_hard: number;
+  kr_easy: number;
+  kr_medd: number;
+  kr_hard: number;
 }
 
 app.get("/", (req, res) => {
@@ -168,6 +177,17 @@ app.get("/api/answers/easy", (req, res) => getAnswers("easy", res));
 app.get("/api/answers/med", (req, res) => getAnswers("med", res));
 app.get("/api/answers/hard", (req, res) => getAnswers("hard", res));
 app.get("/api/word", (req, res) => getAPIword("", res));
+
+app.get(`/highscore/:username`, async (req, res) => {
+  try {
+    const username = req.params.username;
+    const query = `SELECT sp_easy, sp_med, sp_hard, kr_easy, kr_med, kr_hard FROM usrs WHERE username="${username}"`;
+    const [results] = await usr_pool.query<Score[]>(query);
+    res.json(results);
+  } catch (e) {
+    console.error("Error, ", e);
+  }
+});
 
 app.post("/highscore", async (req, res) => {
   try {
