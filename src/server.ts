@@ -210,6 +210,21 @@ app.post("/highscore", async (req, res) => {
   }
 });
 
+app.post("/dictionary", async (req, res) => {
+  try {
+    const { username, term, define, sentence } = req.body;
+    await usr_pool.query(
+      `INSERT INTO dict (username, term, define, sentence) VALUES ("${username}", "${term}", "${define}", "${sentence}")`
+    );
+    res
+      .status(200)
+      .json({ message: "Personal dictionary successfully updated" });
+  } catch (e) {
+    console.error("Error updating personal dictionary, ", e);
+    res.status(500).json({ message: "Error updating personal dictionary" });
+  }
+});
+
 app.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });

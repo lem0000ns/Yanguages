@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Diff from "../components/Configs";
 import Result from "../components/Result";
+import AddDict from "../components/AddDict";
 import Navbar from "../ui/Navbar";
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -105,15 +106,23 @@ const Game = () => {
       ) : (
         <p className="text-red-400">{answered}</p>
       )}
-      <div
-        onClick={() => setNewWords(!newWords)}
-        className="hover:cursor-pointer"
-      >
+      <div>
         {answered.length > 0 && answered[0] == "T" ? (
-          <p>Restart</p>
+          <p
+            onClick={() => setNewWords(!newWords)}
+            className="hover:cursor-pointer"
+          >
+            Restart
+          </p>
         ) : answered.length > 0 ? (
-          <p>Next Question</p>
+          <p
+            onClick={() => setNewWords(!newWords)}
+            className="hover:cursor-pointer"
+          >
+            Next Question
+          </p>
         ) : null}
+        {answered.length > 0 && <AddDict></AddDict>}
       </div>
       {streak == 0 && <Diff setDiff={setDiff} setLang={setLang} />}
     </div>
