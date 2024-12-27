@@ -110,19 +110,21 @@ const Game = () => {
         {answered.length > 0 && answered[0] == "T" ? (
           <p
             onClick={() => setNewWords(!newWords)}
-            className="hover:cursor-pointer"
+            className="flex justify-center items-center mx-auto hover:cursor-pointer"
           >
             Restart
           </p>
         ) : answered.length > 0 ? (
           <p
             onClick={() => setNewWords(!newWords)}
-            className="hover:cursor-pointer"
+            className="flex justify-center items-center mx-auto hover:cursor-pointer"
           >
             Next Question
           </p>
         ) : null}
-        {answered.length > 0 && <AddDict></AddDict>}
+        {answered.length > 0 && (
+          <AddDict term={word} define={wordInfo[0].english}></AddDict>
+        )}
       </div>
       {streak == 0 && <Diff setDiff={setDiff} setLang={setLang} />}
     </div>

@@ -216,9 +216,7 @@ app.post("/dictionary", async (req, res) => {
     await usr_pool.query(
       `INSERT INTO dict (username, term, define, sentence) VALUES ("${username}", "${term}", "${define}", "${sentence}")`
     );
-    res
-      .status(200)
-      .json({ message: "Personal dictionary successfully updated" });
+    res.status(200).json({ message: "Added!" });
   } catch (e) {
     console.error("Error updating personal dictionary, ", e);
     res.status(500).json({ message: "Error updating personal dictionary" });
