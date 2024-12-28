@@ -33,17 +33,18 @@ const AddDict = ({ term, define }) => {
           Add to personal dictionary?
         </button>
       )}
-      {add && (
+      {!message && add && (
         <div className="flex flex-col justify-center items-center mx-auto space-y-4 mt-8">
           <label htmlFor="addItem">Example sentence? (optional)</label>
           <input
             id="addItem"
             type="text"
+            className="text-white block w-[400px] p-2 border border-purple-300 rounded-lg text-base bg-black"
             value={sentence}
             onChange={(e) => setSentence(e.target.value)}
           />
           <button className="border rounded-md p-2" onClick={handleSubmit}>
-            Add
+            <b>Add</b>
           </button>
         </div>
       )}

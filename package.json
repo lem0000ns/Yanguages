@@ -30,6 +30,7 @@
     "next": "^15.1.2",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "react-card-flip": "^1.2.3",
     "react-router-dom": "^7.0.2",
     "translate": "^3.0.1",
     "ts-node": "^10.9.2"

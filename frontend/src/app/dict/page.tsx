@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
+import ReactCardFlip from "react-card-flip";
 
 const Dict = () => {
   const [dictWords, setDictWords] = useState([]);
@@ -11,9 +12,14 @@ const Dict = () => {
   }, []);
 
   useEffect(() => {
-    const storedWords = JSON.parse(localStorage.getItem("storedWords"));
-    setDictWords(storedWords);
-  }, []);
+    (async () => {
+      if (username && username != "") {
+        const res = await fetch(`http://localhost:8080/dictionary/${username}`);
+        const data = await res.json();
+        setDictWords(data[0]);
+      }
+    })();
+  }, [username]);
 
   return (
     <div>
@@ -25,7 +31,10 @@ const Dict = () => {
         </span>
         {dictWords &&
           dictWords.map((word, index) => (
-            <div key={index}>
+            <div
+              className="w-1/3 flex flex-col justify-center items-center mx-auto"
+              key={index}
+            >
               {Object.entries(word).map(([key, value]) => (
                 <div key={key}>
                   <strong>{key}: </strong>

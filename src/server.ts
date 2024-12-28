@@ -223,6 +223,18 @@ app.post("/dictionary", async (req, res) => {
   }
 });
 
+app.get("/dictionary/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    const query = `SELECT term, define, sentence FROM dict WHERE username = "${username}"`;
+    const results = await usr_pool.query(query);
+    res.json(results);
+  } catch (e) {
+    console.error("Error retrieving personal dictionary, ", e);
+    res.status(500).json({ message: "Error retrieving personal dictionary" });
+  }
+});
+
 app.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });
