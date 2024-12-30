@@ -226,12 +226,30 @@ app.post("/dictionary", async (req, res) => {
 app.get("/dictionary/:username", async (req, res) => {
   try {
     const username = req.params.username;
-    const query = `SELECT term, define, sentence FROM dict WHERE username = "${username}"`;
+    const query = `SELECT id, term, define, sentence FROM dict WHERE username = "${username}"`;
     const results = await usr_pool.query(query);
     res.json(results);
   } catch (e) {
     console.error("Error retrieving personal dictionary, ", e);
     res.status(500).json({ message: "Error retrieving personal dictionary" });
+  }
+});
+
+app.delete("/dictionary", async (req, res) => {
+  try {
+    const { deleteIds } = req.body;
+    console.log(deleteIds);
+    if (deleteIds.length > 0) {
+      const temp = deleteIds.map((num) => `id=${num}`);
+      const tempS = temp.join(" OR ");
+      await usr_pool.query(`DELETE FROM dict WHERE ${tempS}`);
+      res.status(200).json({ message: "Successfully deleted dictionary item" });
+    } else {
+      res.status(200).json({ message: "No dictionary items were deleted" });
+    }
+  } catch (e) {
+    console.error("Error deleting dictionary item, ", e);
+    res.status(500).json({ message: "Error deleting dictionary item" });
   }
 });
 
