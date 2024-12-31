@@ -212,9 +212,9 @@ app.post("/highscore", async (req, res) => {
 
 app.post("/dictionary", async (req, res) => {
   try {
-    const { username, term, define, sentence } = req.body;
+    const { username, term, define, sentence, lang } = req.body;
     await usr_pool.query(
-      `INSERT INTO dict (username, term, define, sentence) VALUES ("${username}", "${term}", "${define}", "${sentence}")`
+      `INSERT INTO dict (username, term, define, sentence, lang) VALUES ("${username}", "${term}", "${define}", "${sentence}", "${lang}")`
     );
     res.status(200).json({ message: "Added!" });
   } catch (e) {

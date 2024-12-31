@@ -123,7 +123,11 @@ const Game = () => {
           </p>
         ) : null}
         {answered.length > 0 && (
-          <AddDict term={word} define={wordInfo[0].english}></AddDict>
+          <AddDict
+            term={word}
+            define={wordInfo[0].english}
+            lang={lang}
+          ></AddDict>
         )}
       </div>
       {streak == 0 && <Diff setDiff={setDiff} setLang={setLang} />}

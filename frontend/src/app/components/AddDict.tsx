@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-const AddDict = ({ term, define }) => {
+const AddDict = ({ term, define, lang }) => {
   const [username, setUsername] = useState("");
   const [sentence, setSentence] = useState("");
   const [message, setMessage] = useState("");
@@ -17,10 +17,11 @@ const AddDict = ({ term, define }) => {
     console.log("Term entered: ", term);
     console.log("Definition: ", define);
     console.log("Example sentence", sentence);
+    console.log("Language: ", lang);
     const res = await fetch("http://localhost:8080/dictionary", {
       method: "post",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, term, define, sentence }),
+      body: JSON.stringify({ username, term, define, sentence, lang }),
     });
     const data = await res.json();
     setMessage(data.message);

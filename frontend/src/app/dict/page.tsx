@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 import DictItem from "../components/FlipCard";
+import DictModal from "../components/DictModal";
 
 const Dict = () => {
   const [dictWords, setDictWords] = useState([]);
@@ -38,6 +39,7 @@ const Dict = () => {
           console.log(data.message);
           location.reload();
           setRemove(0);
+          setDeleteIds([]);
         } else {
           console.log(data.message);
         }
@@ -45,6 +47,21 @@ const Dict = () => {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remove]);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        setRemove(0);
+        setDeleteIds([]);
+      }
+    };
+    if (remove > 0) {
+      document.addEventListener("keydown", handleEscape);
+      return () => {
+        window.removeEventListener("keydown", handleEscape);
+      };
+    }
+  });
 
   const handleRemove = async (e) => {
     e.preventDefault();
@@ -61,11 +78,13 @@ const Dict = () => {
             {dictWords ? dictWords.length : "0"} items
           </p>
           <div className="w-3/4 flex justify-between mx-auto mt-3">
-            <p className="border border-sm rounded-md p-2 text-green-400 border-green-200 hover:cursor-pointer">
-              Insert
-            </p>
+            <DictModal />
             <p
-              className="border border-sm rounded-md p-2 text-red-400 border-red-200 hover:cursor-pointer"
+              className={`border border-sm rounded-md p-2 ${
+                remove <= 1 && deleteIds.length == 0
+                  ? "text-red-400 border-red-200"
+                  : "text-red-600 border-red-400"
+              } hover:cursor-pointer`}
               onClick={handleRemove}
             >
               Remove
@@ -86,6 +105,11 @@ const Dict = () => {
               />
             </div>
           ))}
+        {remove > 0 && (
+          <div className="mt-4 text-purple-200">
+            Press esc to exit remove mode
+          </div>
+        )}
       </div>
     </div>
   );
