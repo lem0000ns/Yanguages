@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Navbar from "../ui/Navbar";
 
 const Page = () => {
@@ -8,6 +9,7 @@ const Page = () => {
   const [login, setLogin] = useState(false);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [visible, setVisible] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,29 +41,34 @@ const Page = () => {
     <>
       <Navbar username={login ? username : ""} />
       <div className="flex flex-col justify-center items-center mx-auto mt-32">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center mx-auto"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col items-cente">
           <div className="flex flex-col">
             <label>Username</label>{" "}
             <input
               type="text"
               value={username}
-              className="text-black"
+              className="text-black w-[25vh]"
               onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
           <div className="flex flex-col">
             <label>Password</label>{" "}
-            <input
-              type="password"
-              className="text-black"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="flex flex-row space-x-2 relative w-full">
+              <input
+                type={visible ? "text" : "password"}
+                className="text-black w-[25vh]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <p
+                className="text-x1 cursor-pointer"
+                onClick={() => setVisible(!visible)}
+              >
+                {visible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+              </p>
+            </div>
           </div>
           <button className="mt-2" type="submit">
             Login
