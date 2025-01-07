@@ -223,6 +223,19 @@ app.post("/dictionary", async (req, res) => {
   }
 });
 
+app.put("/dictionary", async (req, res) => {
+  try {
+    const { id, username, term, define, sentence, lang } = req.body;
+    await usr_pool.query(
+      `UPDATE dict SET term = "${term}", define = "${define}", sentence = "${sentence}", lang = "${lang}" WHERE id = ${id} AND username = "${username}"`
+    );
+    res.status(200).json({ message: "Added!" });
+  } catch (e) {
+    console.error("Error updating personal dictionary, ", e);
+    res.status(500).json({ message: "Error updating personal dictionary" });
+  }
+});
+
 app.get("/dictionary/:username", async (req, res) => {
   try {
     const username = req.params.username;
