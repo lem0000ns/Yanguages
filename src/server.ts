@@ -266,6 +266,33 @@ app.delete("/dictionary", async (req, res) => {
   }
 });
 
+app.post("/diary", async (req, res) => {
+  try {
+    const { username, title, entry, date } = req.body;
+    const [rows, fields] = await usr_pool.query(
+      `SELECT * FROM diaries WHERE username="${username}" AND date="${date}"`
+    );
+    console.log("TEMP:");
+    console.log(rows);
+    // already exists, update
+    if (Array.isArray(rows) && rows.length > 0) {
+      await usr_pool.query(
+        `UPDATE diaries SET title="${title}", entry="${entry}" WHERE username="${username}" AND date="${date}"`
+      );
+    }
+    // doesn't exist, insert
+    else {
+      await usr_pool.query(
+        `INSERT INTO diaries (username, title, entry, date) VALUES ("${username}", "${title}", "${entry}", "${date}")`
+      );
+    }
+    res.status(200).json({ message: "Saved!" });
+  } catch (e) {
+    console.error("Error updating diary", e);
+    res.status(500).json({ message: "Error updating diary" });
+  }
+});
+
 app.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });
