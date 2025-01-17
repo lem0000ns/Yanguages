@@ -1,51 +1,94 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
+import Calendar from "../components/Calendar";
 
 const Diary = () => {
   const [username, setUsername] = useState("");
   const [title, setTitle] = useState("");
   const [entry, setEntry] = useState("");
   const [date, setDate] = useState("");
+  const [saving, setSaving] = useState("");
   const [message, setMessage] = useState("");
+  const today = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
     setEntry(localStorage.getItem("entry") || "");
     setTitle(localStorage.getItem("title") || "");
     setMessage("");
-    const date = new Date();
-    const formattedDate = date.toLocaleDateString();
-    setDate(formattedDate);
+    setSaving("");
+    setDate(today);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("entry", entry);
-    localStorage.setItem("title", title);
-  }, [entry, title]);
+    const fetchDiary = async () => {
+      if (username != "") {
+        const res = await fetch(
+          `http://localhost:8080/diary/${username}/${encodeURIComponent(date)}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        if (res.ok) {
+          console.log("Found something!");
+          if (data[0].entry != "undefined") setEntry(data[0].entry);
+          if (data[0].title != "undefined") setTitle(data[0].title);
+        } else if (date != today) {
+          console.log("No diary found on this date");
+          setEntry("");
+          setTitle("");
+          setMessage("No diary found on this date");
+        } else {
+          console.log("Dates match!");
+          setMessage("");
+        }
+      }
+    };
+    fetchDiary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
 
   useEffect(() => {
-    (async () => {
-      const res = await fetch(`http://localhost:8080/diary`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, title, entry, date }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setMessage(data.message);
+    setSaving("...");
+    if (date == today || entry != "" || title != "") setMessage("");
+    const intervalId = setInterval(async () => {
+      await localStorage.setItem("entry", entry);
+      await localStorage.setItem("title", title);
+      if (entry != "" || title != "") {
+        const res = await fetch(`http://localhost:8080/diary`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, title, entry, date }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSaving(data.message);
+        }
       }
-    })();
-  }, [entry, username, title, date]);
+    }, 3000);
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entry, title]);
 
   return (
     <div>
       <Navbar username={username} />
-      <div className="flex justify-center mx-auto mt-8">
+      <div className="flex flex-col items-center justify-center mx-auto mt-8 space-y-2">
         <h1 className="text-2xl">Dear diary...</h1>
+        <Calendar setDate={setDate} />
       </div>
       <div className="flex flex-col mx-auto justify-center mt-4">
         <input
@@ -61,8 +104,13 @@ const Diary = () => {
           value={entry}
           onChange={(e) => setEntry(e.target.value)}
         ></textarea>
+        {saving && !message && (
+          <div className="flex justify-center mx-auto text-emerald-200 mt-3 font-bold">
+            {saving}
+          </div>
+        )}
         {message && (
-          <div className="flex justify-center mx-auto text-emerald-400 mt-3">
+          <div className="flex justify-center mx-auto text-red-300 mt-3 font-bold">
             {message}
           </div>
         )}

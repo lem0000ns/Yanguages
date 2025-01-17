@@ -272,8 +272,6 @@ app.post("/diary", async (req, res) => {
     const [rows, fields] = await usr_pool.query(
       `SELECT * FROM diaries WHERE username="${username}" AND date="${date}"`
     );
-    console.log("TEMP:");
-    console.log(rows);
     // already exists, update
     if (Array.isArray(rows) && rows.length > 0) {
       await usr_pool.query(
@@ -290,6 +288,26 @@ app.post("/diary", async (req, res) => {
   } catch (e) {
     console.error("Error updating diary", e);
     res.status(500).json({ message: "Error updating diary" });
+  }
+});
+
+app.get("/diary/:username/:date", async (req, res) => {
+  try {
+    const username = req.params.username;
+    const date = decodeURIComponent(req.params.date);
+    console.log(date);
+    const query = `SELECT title, entry FROM diaries WHERE username = "${username}" AND date="${date}"`;
+    const [results] = await usr_pool.query(query);
+    if (Array.isArray(results) && results.length > 0) {
+      console.log("Found something!");
+      res.status(200).json(results);
+    } else {
+      console.error("No diary for this date");
+      res.status(500).json({ message: `No diary for ${date}` });
+    }
+  } catch (e) {
+    console.error("Error retrieving personal dictionary, ", e);
+    res.status(500).json({ message: "Error retrieving personal dictionary" });
   }
 });
 

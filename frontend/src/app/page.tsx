@@ -21,7 +21,7 @@ export default function Home() {
         .then((data) => {
           setWordInfo(data);
           localStorage.setItem("wordInfo", JSON.stringify(data));
-          localStorage.setItem("dateToday", new Date().toDateString());
+          localStorage.setItem("dateToday", today);
         })
         .catch((error) => {
           console.error("There was an error retrieving data: ", error);
