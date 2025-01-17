@@ -17,6 +17,8 @@ const Page = () => {
       const res = await fetch("http://localhost:8080/logout");
       if (res.ok) {
         localStorage.removeItem("username");
+        localStorage.removeItem("entry");
+        localStorage.removeItem("title");
         console.log(res.json().message);
         setMessage("Logged out successfully!");
         setLogin(false);

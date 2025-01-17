@@ -7,6 +7,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 const Page = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [pwlen, setPwlen] = useState(0);
   const [confirmPw, setConfirmPw] = useState("");
   const [message, setMessage] = useState("");
   const [visibleOne, setVisibleOne] = useState(false);
@@ -14,10 +15,9 @@ const Page = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(`Username entered: ${username}`);
-    console.log(`Password entered: ${password}`);
-    console.log(`Confirmed Password entered: ${confirmPw}`);
     if (confirmPw != password) setMessage("Passwords don't match");
+    else if (password.length < 8)
+      setMessage("Password must be of at least length 8");
     else {
       try {
         const res = await fetch("http://localhost:8080/register", {
@@ -37,6 +37,11 @@ const Page = () => {
         setMessage("Problem occurred upon registration...");
       }
     }
+  };
+
+  const handlePwChange = (e) => {
+    setPassword(e.target.value);
+    setPwlen(e.target.value.length);
   };
 
   return (
@@ -61,7 +66,7 @@ const Page = () => {
                 type={visibleOne ? "text" : "password"}
                 className="text-black w-[25vh]"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePwChange}
                 required
               />
               <p
@@ -71,6 +76,10 @@ const Page = () => {
                 {visibleOne ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
               </p>
             </div>
+            <p className="text-sm text-blue-100  mt-1">
+              Must be at least 8 characters
+            </p>
+            <p className="text-sm text-blue-100">Current length: {pwlen}</p>
           </div>
           <div className="flex flex-col">
             <label>Confirm Password</label>{" "}
