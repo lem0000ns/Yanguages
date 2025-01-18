@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 import Calendar from "../components/Calendar";
+import Tags from "../components/Tags";
 
 const Diary = () => {
   const [username, setUsername] = useState("");
@@ -12,6 +13,7 @@ const Diary = () => {
   const [date, setDate] = useState("");
   const [saving, setSaving] = useState("");
   const [message, setMessage] = useState("");
+  const [diaryTags, setDiaryTags] = useState<string[]>([]);
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "2-digit",
@@ -90,7 +92,7 @@ const Diary = () => {
         <h1 className="text-2xl">Dear diary...</h1>
         <Calendar setDate={setDate} />
       </div>
-      <div className="flex flex-col mx-auto justify-center mt-4">
+      <div className="flex flex-col mx-auto justify-center items-center mt-4">
         <input
           type="text"
           placeholder="title?"
@@ -104,6 +106,17 @@ const Diary = () => {
           value={entry}
           onChange={(e) => setEntry(e.target.value)}
         ></textarea>
+        <Tags
+          tags={diaryTags}
+          addTags={(event) =>
+            setDiaryTags([...diaryTags, "#" + event.target.value])
+          }
+          removeTags={(indexToRemove) =>
+            setDiaryTags(
+              diaryTags.filter((_, index) => index !== indexToRemove)
+            )
+          }
+        />
         {saving && !message && (
           <div className="flex justify-center mx-auto text-emerald-200 mt-3 font-bold">
             {saving}

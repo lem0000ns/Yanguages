@@ -11,6 +11,8 @@ export default function Home() {
     const today = new Date().toDateString();
     const storedDate = localStorage.getItem("dateToday");
     if (today != storedDate) {
+      localStorage.removeItem("entry");
+      localStorage.removeItem("title");
       fetch(`http://localhost:8080/api/word`)
         .then((response) => {
           if (!response.ok) {
