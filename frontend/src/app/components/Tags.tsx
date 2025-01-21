@@ -10,14 +10,19 @@ interface Props {
 const Tags = ({ tags, addTags, removeTags }: Props) => {
   const [curTag, setCurTag] = useState("");
   const [message, setMessage] = useState("");
+  const [countTags, setCountTags] = useState(0);
 
   const handleEnter = (e) => {
-    if (
+    if (countTags == 5) {
+      setMessage("At most 5 tags can be attached!");
+    } else if (
       e.key == "Enter" &&
       e.target.value.length > 0 &&
       e.target.value.length < 11
     ) {
+      console.log("handle enter");
       addTags(e);
+      setCountTags(countTags + 1);
       setCurTag("");
       setMessage("");
     } else if (e.key == "Enter" && e.target.value.length > 10) {
@@ -25,14 +30,24 @@ const Tags = ({ tags, addTags, removeTags }: Props) => {
     }
   };
 
+  const handleRemove = (index) => {
+    console.log("index");
+    removeTags(index);
+    setCountTags(countTags - 1);
+  };
+
   return (
     <div className="mt-2 space-y-2">
-      <ul className="flex flex-wrap space-x-4 w-3/4 mx-auto">
+      <ul className="flex flex-wrap justify-center space-x-4 mx-auto">
         {tags.map((value, index) => (
-          <li className="list-none" key={index}>
-            <span className="text-violet-400">{value[0]}</span>
-            <span>{value.substring(1)}</span>
-            <div onClick={() => removeTags(index)} />
+          <li
+            className="flex flex-row list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer"
+            onClick={() => {
+              handleRemove(index);
+            }}
+            key={index}
+          >
+            <span>{value}</span>
           </li>
         ))}
       </ul>
@@ -43,7 +58,11 @@ const Tags = ({ tags, addTags, removeTags }: Props) => {
         onChange={(e) => setCurTag(e.target.value)}
         onKeyDown={handleEnter}
       />
-      {message && <div className="text-red-200">{message}</div>}
+      {message && (
+        <div className="flex justify-center mx-auto text-red-200">
+          {message}
+        </div>
+      )}
     </div>
   );
 };

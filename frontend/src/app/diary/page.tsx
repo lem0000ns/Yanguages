@@ -45,15 +45,14 @@ const Diary = () => {
         if (res.ok) {
           console.log("Found something!");
           if (data[0].entry != "undefined") setEntry(data[0].entry);
+          else setEntry("");
           if (data[0].title != "undefined") setTitle(data[0].title);
-        } else if (date != today) {
-          console.log("No diary found on this date");
+          else setTitle("");
+          setMessage("");
+        } else {
           setEntry("");
           setTitle("");
-          setMessage("No diary found on this date");
-        } else {
-          console.log("Dates match!");
-          setMessage("");
+          setMessage(date != today ? "No diary found on this date" : "");
         }
       }
     };
@@ -63,11 +62,10 @@ const Diary = () => {
 
   useEffect(() => {
     setSaving("...");
-    if (date == today || entry != "" || title != "") setMessage("");
     const intervalId = setInterval(async () => {
-      await localStorage.setItem("entry", entry);
-      await localStorage.setItem("title", title);
       if (entry != "" || title != "") {
+        await localStorage.setItem("entry", entry);
+        await localStorage.setItem("title", title);
         const res = await fetch(`http://localhost:8080/diary`, {
           method: "POST",
           headers: {
@@ -75,9 +73,21 @@ const Diary = () => {
           },
           body: JSON.stringify({ username, title, entry, date }),
         });
-        const data = await res.json();
         if (res.ok) {
-          setSaving(data.message);
+          setSaving("Saved!");
+        }
+      } else {
+        if (date == today) {
+          const res = await fetch("http://localhost:8080/diary", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, date }),
+          });
+          if (res.ok) {
+            setSaving("Saved!");
+          }
         }
       }
     }, 3000);
@@ -108,9 +118,7 @@ const Diary = () => {
         ></textarea>
         <Tags
           tags={diaryTags}
-          addTags={(event) =>
-            setDiaryTags([...diaryTags, "#" + event.target.value])
-          }
+          addTags={(event) => setDiaryTags([...diaryTags, event.target.value])}
           removeTags={(indexToRemove) =>
             setDiaryTags(
               diaryTags.filter((_, index) => index !== indexToRemove)

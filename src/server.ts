@@ -311,6 +311,18 @@ app.get("/diary/:username/:date", async (req, res) => {
   }
 });
 
+app.delete("/diary", async (req, res) => {
+  try {
+    const { username, date } = req.body;
+    await usr_pool.query(
+      `DELETE FROM diaries WHERE username="${username}" AND date="${date}"`
+    );
+    res.status(200).json({ message: "Successfully deleted diary entry" });
+  } catch (e) {
+    res.status(500).json({ message: "Problem deleting diary entry" });
+  }
+});
+
 app.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });
