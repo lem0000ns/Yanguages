@@ -71,29 +71,27 @@ const Diary = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, title, entry, date }),
+          body: JSON.stringify({ username, title, entry, date, diaryTags }),
         });
         if (res.ok) {
           setSaving("Saved!");
         }
-      } else {
-        if (date == today) {
-          const res = await fetch("http://localhost:8080/diary", {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, date }),
-          });
-          if (res.ok) {
-            setSaving("Saved!");
-          }
+      } else if (date == today) {
+        const res = await fetch("http://localhost:8080/diary", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, date }),
+        });
+        if (res.ok) {
+          setSaving("Saved!");
         }
       }
     }, 3000);
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entry, title]);
+  }, [entry, title, diaryTags]);
 
   return (
     <div>
@@ -124,6 +122,8 @@ const Diary = () => {
               diaryTags.filter((_, index) => index !== indexToRemove)
             )
           }
+          entry={entry}
+          title={title}
         />
         {saving && !message && (
           <div className="flex justify-center mx-auto text-emerald-200 mt-3 font-bold">

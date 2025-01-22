@@ -266,9 +266,13 @@ app.delete("/dictionary", async (req, res) => {
   }
 });
 
+interface Tag extends RowDataPacket {
+  id: number;
+}
+
 app.post("/diary", async (req, res) => {
   try {
-    const { username, title, entry, date } = req.body;
+    const { username, title, entry, date, diaryTags } = req.body;
     const [rows, fields] = await usr_pool.query(
       `SELECT * FROM diaries WHERE username="${username}" AND date="${date}"`
     );
@@ -277,12 +281,28 @@ app.post("/diary", async (req, res) => {
       await usr_pool.query(
         `UPDATE diaries SET title="${title}", entry="${entry}" WHERE username="${username}" AND date="${date}"`
       );
+      // resetting tags
+      await usr_pool.query(
+        `DELETE FROM tags WHERE username="${username}" AND date="${date}"`
+      );
     }
     // doesn't exist, insert
     else {
       await usr_pool.query(
         `INSERT INTO diaries (username, title, entry, date) VALUES ("${username}", "${title}", "${entry}", "${date}")`
       );
+    }
+    // update tags by iterating through diaryTags
+    const [temp] = await usr_pool.execute<Tag[]>(
+      `SELECT id FROM diaries WHERE username="${username}" AND date="${date}"`
+    );
+    if (Array.isArray(temp) && temp.length > 0) {
+      const diaryId = temp[0].id;
+      for (var i = 0; i < diaryTags.length; i++) {
+        await usr_pool.query(
+          `INSERT INTO tags (diaryId, username, date, tag) VALUES (${diaryId}, "${username}", "${date}", "${diaryTags[i]}")`
+        );
+      }
     }
     res.status(200).json({ message: "Saved!" });
   } catch (e) {
