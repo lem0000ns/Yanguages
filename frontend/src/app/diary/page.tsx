@@ -42,17 +42,20 @@ const Diary = () => {
           }
         );
         const data = await res.json();
+        console.log(data.diaryTags);
         if (res.ok) {
           console.log("Found something!");
           if (data[0].entry != "undefined") setEntry(data[0].entry);
           else setEntry("");
           if (data[0].title != "undefined") setTitle(data[0].title);
           else setTitle("");
+          setDiaryTags(data.diaryTags || []);
           setMessage("");
         } else {
           setEntry("");
           setTitle("");
           setMessage(date != today ? "No diary found on this date" : "");
+          setDiaryTags([]);
         }
       }
     };

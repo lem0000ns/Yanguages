@@ -316,10 +316,21 @@ app.get("/diary/:username/:date", async (req, res) => {
     const username = req.params.username;
     const date = decodeURIComponent(req.params.date);
     console.log(date);
-    const query = `SELECT title, entry FROM diaries WHERE username = "${username}" AND date="${date}"`;
-    const [results] = await usr_pool.query(query);
-    if (Array.isArray(results) && results.length > 0) {
-      console.log("Found something!");
+    const [temp] = await usr_pool.execute<Tag[]>(
+      "SELECT id, title, entry FROM diaries WHERE username = ? AND date = ?",
+      [username, date]
+    );
+    if (Array.isArray(temp) && temp.length > 0) {
+      const diaryId = temp[0].id;
+      const [result] = await usr_pool.query(
+        "SELECT tag FROM tags WHERE diaryId=?",
+        [diaryId]
+      );
+      var diaryTags = [];
+      for (var i in result) {
+        diaryTags.push(result[i].tag);
+      }
+      const results = { ...temp, diaryTags };
       res.status(200).json(results);
     } else {
       console.error("No diary for this date");
