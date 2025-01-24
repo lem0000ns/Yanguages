@@ -25,8 +25,8 @@ const Calendar = ({ setDate }) => {
       <DatePicker
         selected={selectedDate}
         onChange={handleDateChange}
-        dateFormat="MM/DD/YYYY"
         className="text-center text-purple-100 bg-violet-950/75 p-1 rounded rounded-2xl"
+        maxDate={new Date()}
       />
     </div>
   );
