@@ -65,8 +65,9 @@ const Diary = () => {
 
   useEffect(() => {
     setSaving("...");
+    console.log(username);
     const intervalId = setInterval(async () => {
-      if (entry != "" || title != "") {
+      if (username && (entry != "" || title != "")) {
         await localStorage.setItem("entry", entry);
         await localStorage.setItem("title", title);
         const res = await fetch(`http://localhost:8080/diary`, {

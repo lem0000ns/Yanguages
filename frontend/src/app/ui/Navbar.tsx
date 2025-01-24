@@ -1,8 +1,43 @@
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+const LogoutDropdown = () => {
+  const router = useRouter();
+  const [loggedin, setLoggedin] = useState(true);
+
+  const handleLogOut = async (e) => {
+    e.preventDefault();
+    try {
+      // logging out
+      const res = await fetch("http://localhost:8080/logout");
+      if (res.ok) {
+        localStorage.removeItem("username");
+        localStorage.removeItem("entry");
+        localStorage.removeItem("title");
+        setLoggedin(false);
+      } else {
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    if (!loggedin) router.push("/login");
+  }, [loggedin, router]);
+
+  return (
+    <div className="logout-dropdown-container">
+      <ul className="logout-dropdown">
+        <li onClick={handleLogOut}>Log out</li>
+      </ul>
+    </div>
+  );
+};
 
 const Navlinks = () => {
   return (
@@ -21,6 +56,7 @@ interface Props {
 
 const Navbar = ({ username }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [logoutVisible, setLogoutVisible] = useState(false);
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
@@ -32,7 +68,15 @@ const Navbar = ({ username }: Props) => {
         <div className="hidden w-2/3 md:flex space-x-32 justify-between items-center mx-auto">
           <Navlinks />
           {username ? (
-            <Link href="/logout">{username}</Link>
+            <div>
+              <div
+                onMouseEnter={() => setLogoutVisible(true)}
+                onMouseLeave={() => setLogoutVisible(false)}
+              >
+                {username}
+                {logoutVisible && <LogoutDropdown />}
+              </div>
+            </div>
           ) : (
             <Link href="/login">Login</Link>
           )}
@@ -47,7 +91,15 @@ const Navbar = ({ username }: Props) => {
         <div className="md:hidden flex flex-col items-center basis-full space-y-4">
           <Navlinks />
           {username ? (
-            <Link href="/logout">{username}</Link>
+            <div>
+              <div
+                onMouseEnter={() => setLogoutVisible(true)}
+                onMouseLeave={() => setLogoutVisible(false)}
+              >
+                {username}
+                {logoutVisible && <LogoutDropdown />}
+              </div>
+            </div>
           ) : (
             <Link href="/login">Login</Link>
           )}

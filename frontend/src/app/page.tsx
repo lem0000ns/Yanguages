@@ -50,12 +50,17 @@ export default function Home() {
     <div className="w-full">
       <Navbar username={username} />
       <div className="flex flex-col items-center justify-center mx-auto mt-8 space-y-8">
-        <div>The word of the day is...</div>
-        <div className="flex text-center justify-center mx-auto w-1/5">
+        <div className="lg:text-4xl text-3xl w-3/4 flex justify-center mx-auto mt-16">
+          The word of the day is...
+        </div>
+        <div className="flex text-center lg:w-1/5 w-2/3">
           {wordInfo.map((word, index) => (
-            <div key={index}>
+            <div className="text-left flex flex-col space-y-4" key={index}>
               {Object.entries(word).map(([key, value]) => (
-                <div key={key}>
+                <div
+                  className="text-xl hover:bg-violet-800/60 rounded-2xl p-1 transition duration-300 ease-in-out"
+                  key={key}
+                >
                   <strong>{key}: </strong>
                   {value}
                 </div>

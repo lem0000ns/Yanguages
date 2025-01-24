@@ -7,7 +7,6 @@ import Navbar from "../ui/Navbar";
 const Page = () => {
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
-  const [login, setLogin] = useState(true);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
@@ -21,7 +20,6 @@ const Page = () => {
         localStorage.removeItem("title");
         console.log(res.json().message);
         setMessage("Logged out successfully!");
-        setLogin(false);
       } else {
         setMessage("Problem occured in logout....");
       }
@@ -32,8 +30,8 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if (!login) router.push("/");
-  }, [login, router]);
+    if (message[0] == "L") router.push("/");
+  }, [message, router]);
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -41,7 +39,7 @@ const Page = () => {
 
   return (
     <>
-      <Navbar username={login ? username : ""} />
+      <Navbar username={username} />
       <div className="flex flex-col justify-center items-center mx-auto mt-32">
         <h1 className="text-7xl mb-8">Hello, {username}</h1>
         <form
