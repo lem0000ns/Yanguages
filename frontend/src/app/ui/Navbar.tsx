@@ -31,8 +31,8 @@ const LogoutDropdown = () => {
   }, [loggedin, router]);
 
   return (
-    <div className="logout-dropdown-container">
-      <ul className="logout-dropdown">
+    <div className="logout-dropdown-container left-1/2 -translate-x-1/2 absolute w-auto min-w-max">
+      <ul className="logout-dropdown flex">
         <li onClick={handleLogOut}>Log out</li>
       </ul>
     </div>
@@ -70,6 +70,7 @@ const Navbar = ({ username }: Props) => {
           {username ? (
             <div>
               <div
+                className="relative"
                 onMouseEnter={() => setLogoutVisible(true)}
                 onMouseLeave={() => setLogoutVisible(false)}
               >
