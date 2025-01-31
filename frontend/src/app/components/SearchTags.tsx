@@ -5,11 +5,9 @@ interface Props {
   tags: string[];
   addTags: (e: unknown) => void;
   removeTags: (e: unknown) => void;
-  entry: string;
-  title: string;
 }
 
-const Tags = ({ tags, addTags, removeTags, entry, title }: Props) => {
+const Tags = ({ tags, addTags, removeTags }: Props) => {
   const [curTag, setCurTag] = useState("");
   const [message, setMessage] = useState("");
   const [countTags, setCountTags] = useState(0);
@@ -17,16 +15,16 @@ const Tags = ({ tags, addTags, removeTags, entry, title }: Props) => {
   const handleEnter = (e) => {
     if (e.key == "Enter") {
       if (countTags == 5) {
-        setMessage("At most 5 tags can be attached!");
+        setMessage("5 tag search limit!");
       } else if (tags.includes(curTag)) {
         setMessage("No duplicate tags!");
-      } else if (entry == "" && title == "") {
-        setMessage("Write to diary to add tags!");
       } else if (curTag.length > 10) {
         setMessage("Tags must be at most 10 characters long!");
       } else {
         addTags(e);
+        console.log(countTags);
         setCountTags(countTags + 1);
+        console.log(countTags);
         setCurTag("");
         setMessage("");
       }
@@ -40,8 +38,8 @@ const Tags = ({ tags, addTags, removeTags, entry, title }: Props) => {
   };
 
   return (
-    <div className="mt-2 space-y-2">
-      <ul className="flex flex-wrap justify-center space-x-4 mx-auto">
+    <div className="mt-2 space-y-2 md:w-1/3 w-1/2 relative">
+      <ul className="flex md:flex-nowrap flex-wrap justify-end right-0 absolute space-x-4 mx-auto bottom-full">
         {tags.map((value, index) => (
           <li
             className="flex flex-row list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer"
@@ -55,14 +53,14 @@ const Tags = ({ tags, addTags, removeTags, entry, title }: Props) => {
         ))}
       </ul>
       <input
-        className="flex justify-center rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
-        placeholder="add tags?"
+        className="flex w-full justify-center rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
+        placeholder="search by tag?"
         value={curTag}
         onChange={(e) => setCurTag(e.target.value)}
         onKeyDown={handleEnter}
       />
       {message && (
-        <div className="flex justify-center mx-auto text-red-200">
+        <div className="flex absolute items-center justify-center mx-auto text-red-200">
           {message}
         </div>
       )}
