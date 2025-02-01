@@ -104,7 +104,7 @@ const Entry = ({ searchTags, setSearchTags }: Props) => {
     <div>
       <div className="flex flex-col items-left mx-auto w-2/3 mt-16 space-y-4">
         <div className="flex flex-row items-center justify-between w-full">
-          <h1 className="text-2xl">Dear diary...</h1>
+          <h1 className="text-2xl ml-4">Dear diary...</h1>
           <SearchTags
             tags={searchTags}
             addTags={(event) =>

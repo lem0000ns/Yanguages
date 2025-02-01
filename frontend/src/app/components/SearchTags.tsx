@@ -38,11 +38,11 @@ const Tags = ({ tags, addTags, removeTags }: Props) => {
   };
 
   return (
-    <div className="mt-2 space-y-2 md:w-1/3 w-1/2 relative">
-      <ul className="flex md:flex-nowrap flex-wrap justify-end right-0 absolute space-x-4 mx-auto bottom-full">
+    <div className="flex items-center mt-2 space-y-2 md:w-1/3 w-1/2 relative">
+      <ul className="m-0 flex flex-row gap-x-2 w-full rounded-3xl bg-indigo-950 overflow-x-auto flex-nowrap absolute bottom-full">
         {tags.map((value, index) => (
           <li
-            className="flex flex-row list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer"
+            className="list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer flex-shrink-0"
             onClick={() => {
               handleRemove(index);
             }}
@@ -53,14 +53,14 @@ const Tags = ({ tags, addTags, removeTags }: Props) => {
         ))}
       </ul>
       <input
-        className="flex w-full justify-center rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
+        className="flex w-full rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
         placeholder="search by tag?"
         value={curTag}
         onChange={(e) => setCurTag(e.target.value)}
         onKeyDown={handleEnter}
       />
       {message && (
-        <div className="flex absolute items-center justify-center mx-auto text-red-200">
+        <div className="flex absolute items-center justify-center mx-auto text-red-200 top-full">
           {message}
         </div>
       )}
