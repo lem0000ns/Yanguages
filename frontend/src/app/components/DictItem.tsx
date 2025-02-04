@@ -48,22 +48,21 @@ const FlipCard = ({ word }) => {
   };
 
   return (
-    <div className="absolute w-full">
+    <div className="absolute w-full bottom-full top-full">
       <div className="flex flex-col justify-center items-center mx-auto rounded-md border border-white-100 p-2">
         {Object.entries(word).map(([key, value]) =>
           key == "id" || (key == "sentence" && value == "") ? null : (
-            <div className="flex" key={key}>
-              <span
-                className={
-                  key == "define"
-                    ? "text-purple-400"
-                    : key == "sentence"
-                    ? "text-purple-100 italic"
-                    : ""
-                }
-              >
-                {value}
-              </span>
+            <span
+              key={key}
+              className={`${
+                key == "define"
+                  ? "text-purple-400"
+                  : key == "sentence"
+                  ? "text-purple-100 italic overflow-x-auto"
+                  : ""
+              }`}
+            >
+              {value}
               <EditModal
                 id={word.id}
                 term={word.term}
@@ -71,7 +70,7 @@ const FlipCard = ({ word }) => {
                 sentence={word.sentence}
                 lang={word.lang}
               />
-            </div>
+            </span>
           )
         )}
       </div>

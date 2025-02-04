@@ -103,8 +103,9 @@ const Entry = ({ searchTags, setSearchTags }: Props) => {
   return (
     <div>
       <div className="flex flex-col items-left mx-auto w-2/3 mt-16 space-y-4">
+        <h1 className="text-2xl ml-4">Dear diary...</h1>
         <div className="flex flex-row items-center justify-between w-full">
-          <h1 className="text-2xl ml-4">Dear diary...</h1>
+          <Calendar setDate={setDate} />
           <SearchTags
             tags={searchTags}
             addTags={(event) =>
@@ -118,7 +119,6 @@ const Entry = ({ searchTags, setSearchTags }: Props) => {
             placeholder="search by tag?"
           />
         </div>
-        <Calendar setDate={setDate} />
       </div>
       <div className="flex flex-col mx-auto items-left mx-auto w-2/3 mt-4">
         <input

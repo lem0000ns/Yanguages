@@ -7,24 +7,29 @@ const AddDict = ({ term, define, lang }) => {
   const [sentence, setSentence] = useState("");
   const [message, setMessage] = useState("");
   const [add, setAdd] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Term entered: ", term);
-    console.log("Definition: ", define);
-    console.log("Example sentence", sentence);
-    console.log("Language: ", lang);
-    const res = await fetch("http://localhost:8080/dictionary", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, term, define, sentence, lang }),
-    });
-    const data = await res.json();
-    setMessage(data.message);
+    if (sentence.length > 50) {
+      setError("Sentence must be at most 50 characters");
+    } else {
+      e.preventDefault();
+      console.log("Term entered: ", term);
+      console.log("Definition: ", define);
+      console.log("Example sentence", sentence);
+      console.log("Language: ", lang);
+      const res = await fetch("http://localhost:8080/dictionary", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, term, define, sentence, lang }),
+      });
+      const data = await res.json();
+      setMessage(data.message);
+    }
   };
 
   return (
@@ -44,6 +49,7 @@ const AddDict = ({ term, define, lang }) => {
             value={sentence}
             onChange={(e) => setSentence(e.target.value)}
           />
+          {error && <p className="text-red-400 flex text-center">{error}</p>}
           <button className="border rounded-md p-2" onClick={handleSubmit}>
             <b>Add</b>
           </button>

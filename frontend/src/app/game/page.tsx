@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Diff from "../components/Configs";
 import Result from "../components/Result";
-import AddDict from "../components/AddDict";
+import AddDict from "../components/GameAddDict";
 import Navbar from "../ui/Navbar";
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array

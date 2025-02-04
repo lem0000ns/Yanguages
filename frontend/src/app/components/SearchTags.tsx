@@ -38,8 +38,8 @@ const Tags = ({ tags, addTags, removeTags }: Props) => {
   };
 
   return (
-    <div className="flex items-center mt-2 space-y-2 md:w-1/3 w-1/2 relative">
-      <ul className="m-0 flex flex-row gap-x-2 w-full rounded-3xl bg-indigo-950 overflow-x-auto flex-nowrap absolute bottom-full">
+    <div className="flex items-center md:w-1/3 w-1/2 relative">
+      <ul className="m-0 flex flex-row gap-x-2 w-full rounded-3xl bg-indigo-950 overflow-x-auto flex-nowrap absolute mb-2 bottom-full">
         {tags.map((value, index) => (
           <li
             className="list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer flex-shrink-0"

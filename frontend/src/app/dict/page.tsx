@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
-import DictItem from "../components/FlipCard";
-import DictModal from "../components/DictModal";
+import DictItem from "../components/DictItem";
+import DictModal from "../components/AddDictModal";
 
 const Dict = () => {
   const [dictWords, setDictWords] = useState([]);
@@ -91,7 +91,7 @@ const Dict = () => {
             </p>
           </div>
         </div>
-        <div className="w-full grid grid-cols-3 gap-4">
+        <div className="w-full grid grid-cols-3 gap-y-32">
           {dictWords &&
             dictWords.map((word, index) => (
               <div
