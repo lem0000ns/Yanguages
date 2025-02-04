@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import ReactCardFlip from "react-card-flip";
 import { MdOutlineEdit } from "react-icons/md";
 
 const FlipCard = ({ word }) => {
-  const [flipped, setFlipped] = useState(false);
   const [username, setUsername] = useState("");
   const [modal, setModal] = useState(false);
   const [id, setId] = useState(0);
@@ -49,47 +47,34 @@ const FlipCard = ({ word }) => {
     );
   };
 
-  const handleFlip = () => {
-    setFlipped(!flipped);
-    if (!flipped) {
-      setModal(false);
-    }
-  };
-
   return (
-    <div className="relative">
-      <ReactCardFlip isFlipped={flipped} flipDirection="vertical">
-        <div className="flex flex-col">
-          <p
-            className="border border-sm rounded-md p-2 hover:cursor-grab"
-            onClick={handleFlip}
-          >
-            {word.term}
-          </p>
-        </div>
-
-        <div className="flex flex-col justify-center items-center mx-auto rounded-md border border-white-100 p-2">
-          {Object.entries(word).map(([key, value]) =>
-            key == "id" || (key == "sentence" && value == "") ? null : (
-              <div key={key}>
-                <strong className="hover:cursor-grab" onClick={handleFlip}>
-                  {key}:{" "}
-                </strong>
-                <span className="hover:cursor-grab" onClick={handleFlip}>
-                  {value}
-                </span>
-                <EditModal
-                  id={word.id}
-                  term={word.term}
-                  define={word.define}
-                  sentence={word.sentence}
-                  lang={word.lang}
-                />
-              </div>
-            )
-          )}
-        </div>
-      </ReactCardFlip>
+    <div className="absolute w-full">
+      <div className="flex flex-col justify-center items-center mx-auto rounded-md border border-white-100 p-2">
+        {Object.entries(word).map(([key, value]) =>
+          key == "id" || (key == "sentence" && value == "") ? null : (
+            <div className="flex" key={key}>
+              <span
+                className={
+                  key == "define"
+                    ? "text-purple-400"
+                    : key == "sentence"
+                    ? "text-purple-100 italic"
+                    : ""
+                }
+              >
+                {value}
+              </span>
+              <EditModal
+                id={word.id}
+                term={word.term}
+                define={word.define}
+                sentence={word.sentence}
+                lang={word.lang}
+              />
+            </div>
+          )
+        )}
+      </div>
       {modal && (
         <div className="modal">
           <div onClick={toggleModal} className="overlay"></div>

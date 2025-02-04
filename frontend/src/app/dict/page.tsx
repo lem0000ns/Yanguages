@@ -91,20 +91,22 @@ const Dict = () => {
             </p>
           </div>
         </div>
-        {dictWords &&
-          dictWords.map((word, index) => (
-            <div
-              className="w-1/3 flex flex-col justify-center items-center mx-auto mt-4"
-              key={index}
-            >
-              <DictItem
-                deleteIds={deleteIds}
-                setDeleteIds={setDeleteIds}
-                remove={remove}
-                word={word}
-              />
-            </div>
-          ))}
+        <div className="w-full grid grid-cols-3 gap-4">
+          {dictWords &&
+            dictWords.map((word, index) => (
+              <div
+                className="w-4/5 flex flex-col justify-center items-center mx-auto mt-12 relative"
+                key={index}
+              >
+                <DictItem
+                  deleteIds={deleteIds}
+                  setDeleteIds={setDeleteIds}
+                  remove={remove}
+                  word={word}
+                />
+              </div>
+            ))}
+        </div>
         {remove > 0 && (
           <div className="mt-4 text-purple-200">
             Press esc to exit remove mode
