@@ -1,13 +1,34 @@
 "use client";
 import React, { useState } from "react";
 
+const MagnifyingGlass = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-search"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+};
+
 interface Props {
   tags: string[];
   addTags: (e: unknown) => void;
   removeTags: (e: unknown) => void;
+  handleTagSearch: (e: unknown) => void;
 }
 
-const Tags = ({ tags, addTags, removeTags }: Props) => {
+const Tags = ({ tags, addTags, removeTags, handleTagSearch }: Props) => {
   const [curTag, setCurTag] = useState("");
   const [message, setMessage] = useState("");
   const [countTags, setCountTags] = useState(0);
@@ -59,6 +80,9 @@ const Tags = ({ tags, addTags, removeTags }: Props) => {
         onChange={(e) => setCurTag(e.target.value)}
         onKeyDown={handleEnter}
       />
+      <div className="ml-2 hover:cursor-pointer" onClick={handleTagSearch}>
+        <MagnifyingGlass />
+      </div>
       {message && (
         <div className="flex absolute items-center justify-center mx-auto text-red-200 top-full">
           {message}

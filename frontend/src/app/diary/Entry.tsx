@@ -7,9 +7,10 @@ import SearchTags from "../components/SearchTags";
 interface Props {
   searchTags: string[];
   setSearchTags: (tags: string[]) => void;
+  handleTagSearch: () => void;
 }
 
-const Entry = ({ searchTags, setSearchTags }: Props) => {
+const Entry = ({ searchTags, setSearchTags, handleTagSearch }: Props) => {
   const [username, setUsername] = useState("");
   const [title, setTitle] = useState("");
   const [entry, setEntry] = useState("");
@@ -31,7 +32,7 @@ const Entry = ({ searchTags, setSearchTags }: Props) => {
     setMessage("");
     setSaving("");
     setDate(today);
-  }, []);
+  }, [today]);
 
   useEffect(() => {
     const fetchDiary = async () => {
@@ -116,6 +117,7 @@ const Entry = ({ searchTags, setSearchTags }: Props) => {
                 searchTags.filter((_, index) => index !== indexToRemove)
               )
             }
+            handleTagSearch={handleTagSearch}
             placeholder="search by tag?"
           />
         </div>

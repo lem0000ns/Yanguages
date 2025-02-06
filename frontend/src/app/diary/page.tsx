@@ -15,7 +15,12 @@ const Diary = () => {
   }, []);
 
   useEffect(() => {
-    const fetchEntries = async () => {
+    console.log(searchEntries);
+  }, [searchEntries]);
+
+  const handleTagSearch = async () => {
+    console.log("magnifying glass clicked!");
+    if (searchTags.length > 0) {
       try {
         const queryParams = new URLSearchParams({
           username: username,
@@ -34,14 +39,17 @@ const Diary = () => {
       } catch (e) {
         console.error("Error fetching entries with given tags", e);
       }
-    };
-    fetchEntries();
-  }, [searchTags]);
+    }
+  };
 
   return (
     <div>
       <Navbar username={username} />
-      <Entry searchTags={searchTags} setSearchTags={setSearchTags} />
+      <Entry
+        searchTags={searchTags}
+        setSearchTags={setSearchTags}
+        handleTagSearch={handleTagSearch}
+      />
     </div>
   );
 };
