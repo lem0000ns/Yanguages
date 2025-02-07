@@ -311,6 +311,25 @@ app.post("/diary", async (req, res) => {
   }
 });
 
+app.get("/tags/", async (req, res) => {
+  try {
+    const username = req.query.username;
+    const searchTags = (req.query.searchTags as string).split(",");
+    let temp = "";
+    for (let i = 0; i < searchTags.length; i++) {
+      temp += `tags.tag="${searchTags[i]}" OR `;
+    }
+    temp = temp.substring(0, temp.length - 3);
+    const res = await usr_pool.query(
+      `SELECT diaries.id FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username="${username}" AND (${temp})`
+    );
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: "Error retrieving diary entries with specified tags" });
+  }
+});
+
 app.get("/diary/:username/:date", async (req, res) => {
   try {
     const username = req.params.username;

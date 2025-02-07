@@ -43,9 +43,7 @@ const Tags = ({ tags, addTags, removeTags, handleTagSearch }: Props) => {
         setMessage("Tags must be at most 10 characters long!");
       } else {
         addTags(e);
-        console.log(countTags);
         setCountTags(countTags + 1);
-        console.log(countTags);
         setCurTag("");
         setMessage("");
       }
@@ -53,7 +51,6 @@ const Tags = ({ tags, addTags, removeTags, handleTagSearch }: Props) => {
   };
 
   const handleRemove = (index) => {
-    console.log("index");
     removeTags(index);
     setCountTags(countTags - 1);
   };

@@ -47,9 +47,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch }: Props) => {
           }
         );
         const data = await res.json();
-        console.log(data.diaryTags);
         if (res.ok) {
-          console.log("Found something!");
           if (data[0].entry != "undefined") setEntry(data[0].entry);
           else setEntry("");
           if (data[0].title != "undefined") setTitle(data[0].title);
@@ -70,7 +68,6 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch }: Props) => {
 
   useEffect(() => {
     setSaving("...");
-    console.log(username);
     const intervalId = setInterval(async () => {
       if (username && (entry != "" || title != "")) {
         await localStorage.setItem("entry", entry);
