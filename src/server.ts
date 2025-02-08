@@ -317,13 +317,14 @@ app.get("/tags/", async (req, res) => {
     const searchTags = (req.query.searchTags as string).split(",");
     let temp = "";
     for (let i = 0; i < searchTags.length; i++) {
-      temp += `tags.tag="${searchTags[i]}" OR `;
+      temp += `tags.tag="${searchTags[i]}" AND `;
     }
-    temp = temp.substring(0, temp.length - 3);
-    const res = await usr_pool.query(
-      `SELECT diaries.id FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username="${username}" AND (${temp})`
-    );
+    temp = temp.substring(0, temp.length - 4);
+    const query = `SELECT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username="${username}" AND (${temp})`;
+    const results = await usr_pool.query(query);
+    res.status(200).json(results);
   } catch (e) {
+    console.error("error retrieving diary entries with tags", e);
     res
       .status(500)
       .json({ message: "Error retrieving diary entries with specified tags" });

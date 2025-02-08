@@ -91,7 +91,7 @@ const Dict = () => {
             </p>
           </div>
         </div>
-        <div className="w-full grid grid-cols-3 gap-y-32">
+        <div className="w-full grid sm:grid-cols-4 grid-cols-3 gap-y-16">
           {dictWords &&
             dictWords.map((word, index) => (
               <div

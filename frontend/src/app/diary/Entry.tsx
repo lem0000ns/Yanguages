@@ -8,9 +8,10 @@ interface Props {
   searchTags: string[];
   setSearchTags: (tags: string[]) => void;
   handleTagSearch: () => void;
+  day: Date;
 }
 
-const Entry = ({ searchTags, setSearchTags, handleTagSearch }: Props) => {
+const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   const [username, setUsername] = useState("");
   const [title, setTitle] = useState("");
   const [entry, setEntry] = useState("");
@@ -19,20 +20,14 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch }: Props) => {
   const [message, setMessage] = useState("");
   const [diaryTags, setDiaryTags] = useState<string[]>([]);
 
-  const today = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
     setEntry(localStorage.getItem("entry") || "");
     setTitle(localStorage.getItem("title") || "");
     setMessage("");
     setSaving("");
-    setDate(today);
-  }, [today]);
+    setDate(day);
+  }, [day]);
 
   useEffect(() => {
     const fetchDiary = async () => {
@@ -103,7 +98,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch }: Props) => {
       <div className="flex flex-col items-left mx-auto w-2/3 mt-16 space-y-4">
         <h1 className="text-2xl ml-4">Dear diary...</h1>
         <div className="flex flex-row items-center justify-between w-full">
-          <Calendar setDate={setDate} />
+          <Calendar day={day} setDate={setDate} />
           <SearchTags
             tags={searchTags}
             addTags={(event) =>
