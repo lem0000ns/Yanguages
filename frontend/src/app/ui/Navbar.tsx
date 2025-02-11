@@ -42,7 +42,6 @@ const LogoutDropdown = () => {
 const Navlinks = () => {
   return (
     <div className="md:space-x-16 flex md:flex-row md:space-y-0 flex-col space-y-4 items-center">
-      <Link href="/">Home</Link>
       <Link href="/diary">Diary</Link>
       <Link href="/game">Game</Link>
       <Link href="/dict">Dictionary</Link>
@@ -63,9 +62,10 @@ const Navbar = ({ username }: Props) => {
   };
 
   return (
-    <header className="top-0 bg-black flex-wrap z-[20] mx-auto flex w-full items-center justify-between border-b border-purple p-8">
+    <header className="top-0 bg-violet-950/50 flex-wrap z-[20] mx-auto flex w-full items-center justify-between border-b border-purple p-8">
       <nav className="w-full">
-        <div className="hidden w-2/3 md:flex space-x-32 justify-between items-center mx-auto">
+        <div className="hidden w-5/6 md:flex space-x-32 justify-between items-center mx-auto">
+          <Link href="/">Yanguages</Link>
           <Navlinks />
           {username ? (
             <div>
@@ -90,6 +90,7 @@ const Navbar = ({ username }: Props) => {
       </nav>
       {isOpen && (
         <div className="md:hidden flex flex-col items-center basis-full space-y-4">
+          <Link href="/">Yanguages</Link>
           <Navlinks />
           {username ? (
             <div>

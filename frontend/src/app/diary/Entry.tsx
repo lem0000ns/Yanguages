@@ -52,7 +52,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         } else {
           setEntry("");
           setTitle("");
-          setMessage(date != today ? "No diary found on this date" : "");
+          setMessage(date != day ? "No diary found on this date" : "");
           setDiaryTags([]);
         }
       }
@@ -77,7 +77,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         if (res.ok) {
           setSaving("Saved!");
         }
-      } else if (date == today) {
+      } else if (date == day) {
         const res = await fetch("http://localhost:8080/diary", {
           method: "DELETE",
           headers: {

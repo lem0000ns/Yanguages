@@ -27,21 +27,25 @@ const Dict = () => {
   useEffect(() => {
     (async () => {
       if (remove == 2) {
-        const res = await fetch("http://localhost:8080/dictionary", {
-          method: "delete",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ deleteIds }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-          console.log(data.message);
-          location.reload();
+        if (deleteIds.length == 0) {
           setRemove(0);
-          setDeleteIds([]);
         } else {
-          console.log(data.message);
+          const res = await fetch("http://localhost:8080/dictionary", {
+            method: "delete",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ deleteIds }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            console.log(data.message);
+            location.reload();
+            setRemove(0);
+            setDeleteIds([]);
+          } else {
+            console.log(data.message);
+          }
         }
       }
     })();
@@ -101,15 +105,15 @@ const Dict = () => {
                 <DictItem
                   deleteIds={deleteIds}
                   setDeleteIds={setDeleteIds}
-                  remove={remove}
                   word={word}
+                  remove={remove}
                 />
               </div>
             ))}
         </div>
         {remove > 0 && (
-          <div className="mt-4 text-purple-200">
-            Press esc to exit remove mode
+          <div className="relative mt-4 text-purple-200">
+            <p className="absolute">Press esc to exit remove mode</p>
           </div>
         )}
       </div>

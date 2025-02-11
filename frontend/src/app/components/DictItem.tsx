@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MdOutlineEdit } from "react-icons/md";
 
-const FlipCard = ({ word }) => {
+const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
   const [username, setUsername] = useState("");
   const [modal, setModal] = useState(false);
   const [id, setId] = useState(0);
@@ -9,6 +9,7 @@ const FlipCard = ({ word }) => {
   const [define, setDefine] = useState("");
   const [sentence, setSentence] = useState("");
   const [lang, setLang] = useState("");
+  const [selected, setSelected] = useState(false);
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -48,18 +49,38 @@ const FlipCard = ({ word }) => {
   };
 
   return (
-    <div className="absolute w-full bottom-full top-full">
-      <div className="flex flex-col justify-center items-center mx-auto rounded-md border border-white-100 p-2">
+    <div className="absolute w-full">
+      <div
+        className={`flex flex-col text-center mx-auto rounded-md border p-2 border border-sm rounded-md p-2 ${
+          selected && remove > 0
+            ? "border-red-700 hover:cursor-grab"
+            : remove > 0
+            ? "border-red-300 hover:cursor-grab"
+            : "border-white-100"
+        }`}
+        onClick={() => {
+          if (remove > 0) {
+            if (!selected) {
+              setDeleteIds((prevIds) => [...prevIds, word.id]);
+            } else {
+              setDeleteIds(deleteIds.filter((id) => id !== word.id));
+              const index = deleteIds.indexOf(word.id);
+              deleteIds.splice(index, 1);
+            }
+            setSelected(!selected);
+          }
+        }}
+      >
         {Object.entries(word).map(([key, value]) =>
           key == "id" || (key == "sentence" && value == "") ? null : (
-            <span
+            <div
               key={key}
               className={`${
                 key == "define"
-                  ? "text-purple-400"
+                  ? "text-purple-400 whitespace-nowrap overflow-x-auto"
                   : key == "sentence"
-                  ? "text-purple-100 italic overflow-x-auto"
-                  : ""
+                  ? "w-full text-purple-100 italic whitespace-nowrap overflow-x-auto"
+                  : "whitespace-nowrap overflow-x-auto"
               }`}
             >
               {value}
@@ -70,7 +91,7 @@ const FlipCard = ({ word }) => {
                 sentence={word.sentence}
                 lang={word.lang}
               />
-            </span>
+            </div>
           )
         )}
       </div>
@@ -132,48 +153,6 @@ const FlipCard = ({ word }) => {
         </div>
       )}
     </div>
-  );
-};
-
-const RemoveCard = ({ deleteIds, setDeleteIds, word }) => {
-  const [selected, setSelected] = useState(false);
-  return (
-    <div className="flex flex-col">
-      <p
-        className={`border border-sm rounded-md p-2 hover:cursor-grab ${
-          selected ? "border-red-700" : "border-red-300"
-        }`}
-        onClick={() => {
-          if (!selected) {
-            setDeleteIds((prevIds) => [...prevIds, word.id]);
-            console.log(deleteIds);
-          } else {
-            setDeleteIds(deleteIds.filter((id) => id !== word.id));
-            const index = deleteIds.indexOf(word.id);
-            deleteIds.splice(index, 1);
-          }
-          setSelected(!selected);
-        }}
-      >
-        {word.term}
-      </p>
-    </div>
-  );
-};
-
-const DictItem = ({ deleteIds, setDeleteIds, remove, word }) => {
-  return (
-    <>
-      {remove == 0 ? (
-        <FlipCard word={word} />
-      ) : (
-        <RemoveCard
-          deleteIds={deleteIds}
-          setDeleteIds={setDeleteIds}
-          word={word}
-        />
-      )}
-    </>
   );
 };
 

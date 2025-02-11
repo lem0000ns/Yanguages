@@ -23,8 +23,8 @@ const DictModal = () => {
       setMessage("Term must be at most 30 characters long");
     } else if (define.length > 30) {
       setMessage("Definition must be at most 50 characters long");
-    } else if (sentence.length > 50) {
-      setMessage("Sentence must be at most 50 characters long");
+    } else if (sentence.length > 100) {
+      setMessage("Sentence must be at most 100 characters long");
     } else if (lang.length > 20) {
       setMessage("Lang must be at most 20 characters long");
     } else {

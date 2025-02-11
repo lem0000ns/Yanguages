@@ -14,8 +14,8 @@ const AddDict = ({ term, define, lang }) => {
   }, []);
 
   const handleSubmit = async (e) => {
-    if (sentence.length > 50) {
-      setError("Sentence must be at most 50 characters");
+    if (sentence.length > 100) {
+      setError("Sentence must be at most 100 characters");
     } else {
       e.preventDefault();
       console.log("Term entered: ", term);
