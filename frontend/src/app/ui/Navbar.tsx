@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import UserIcon from "../ui/UserIcon";
 
 const LogoutDropdown = () => {
   const router = useRouter();
@@ -31,7 +32,7 @@ const LogoutDropdown = () => {
   }, [loggedin, router]);
 
   return (
-    <div className="logout-dropdown-container left-1/2 -translate-x-1/2 absolute w-auto min-w-max">
+    <div className="logout-dropdown-container absolute min-w-max">
       <ul className="logout-dropdown flex">
         <li onClick={handleLogOut}>Log out</li>
       </ul>
@@ -62,13 +63,14 @@ const Navbar = ({ username }: Props) => {
   };
 
   return (
-    <header className="top-0 bg-violet-950/50 flex-wrap z-[20] mx-auto flex w-full items-center justify-between border-b border-purple p-8">
+    <header className="top-0 bg-violet-950/50 flex-wrap z-[20] mx-auto flex w-full items-center justify-between p-8">
       <nav className="w-full">
         <div className="hidden w-5/6 md:flex space-x-32 justify-between items-center mx-auto">
           <Link href="/">Yanguages</Link>
           <Navlinks />
           {username ? (
-            <div>
+            <div className="flex flex-row items-center space-x-2">
+              <UserIcon />
               <div
                 className="relative"
                 onMouseEnter={() => setLogoutVisible(true)}
@@ -93,7 +95,8 @@ const Navbar = ({ username }: Props) => {
           <Link href="/">Yanguages</Link>
           <Navlinks />
           {username ? (
-            <div>
+            <div className="flex flex-row space-x-2 items-center">
+              <UserIcon />
               <div
                 onMouseEnter={() => setLogoutVisible(true)}
                 onMouseLeave={() => setLogoutVisible(false)}
