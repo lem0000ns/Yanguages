@@ -226,8 +226,9 @@ app.post("/dictionary", async (req, res) => {
 app.put("/dictionary", async (req, res) => {
   try {
     const { id, username, term, define, sentence, lang } = req.body;
+    const tempLang = lang == "None" ? "" : lang;
     await usr_pool.query(
-      `UPDATE dict SET term = "${term}", define = "${define}", sentence = "${sentence}", lang = "${lang}" WHERE id = ${id} AND username = "${username}"`
+      `UPDATE dict SET term = "${term}", define = "${define}", sentence = "${sentence}", lang = "${tempLang}" WHERE id = ${id} AND username = "${username}"`
     );
     res.status(200).json({ message: "Added!" });
   } catch (e) {
@@ -239,7 +240,7 @@ app.put("/dictionary", async (req, res) => {
 app.get("/dictionary/:username", async (req, res) => {
   try {
     const username = req.params.username;
-    const query = `SELECT id, term, define, sentence FROM dict WHERE username = "${username}"`;
+    const query = `SELECT id, term, define, sentence, lang FROM dict WHERE username = "${username}"`;
     const results = await usr_pool.query(query);
     res.json(results);
   } catch (e) {

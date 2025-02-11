@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { MdOutlineEdit } from "react-icons/md";
+import Dropdown from "../ui/Dropdown";
+import UpArrow from "../ui/UpArrow";
+import DownArrow from "../ui/DownArrow";
 
 const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
   const [username, setUsername] = useState("");
@@ -10,6 +13,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
   const [sentence, setSentence] = useState("");
   const [lang, setLang] = useState("");
   const [selected, setSelected] = useState(false);
+  const [dropdownToggle, setDropdownToggle] = useState(false);
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -72,7 +76,9 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
         }}
       >
         {Object.entries(word).map(([key, value]) =>
-          key == "id" || (key == "sentence" && value == "") ? null : (
+          key == "id" ||
+          key == "lang" ||
+          (key == "sentence" && value == "") ? null : (
             <div
               key={key}
               className={`${
@@ -124,13 +130,24 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
                 value={sentence}
                 onChange={(e) => setSentence(e.target.value)}
               />
-              <label>Edit language</label>
-              <input
-                type="text"
-                value={lang}
-                onChange={(e) => setLang(e.target.value)}
-              />
-              <button type="submit">Add</button>
+              <div
+                className="flex flex-row items-center hover:cursor-pointer"
+                onClick={() => setDropdownToggle(!dropdownToggle)}
+              >
+                <label>Select language</label>
+                {dropdownToggle ? <UpArrow /> : <DownArrow />}
+              </div>
+              {dropdownToggle && (
+                <Dropdown
+                  options={["None", "Spanish", "Korean"]}
+                  setOption={setLang}
+                  setToggle={setDropdownToggle}
+                />
+              )}
+              {!dropdownToggle && lang != "None" && lang != "" && (
+                <p className="text-violet-800">{`Language: ${lang}`}</p>
+              )}
+              <button type="submit">Edit</button>
             </form>
             <button className="close-modal" onClick={toggleModal}>
               <svg

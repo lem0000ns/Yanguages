@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Dropdown from "../ui/Dropdown";
+import UpArrow from "../ui/UpArrow";
+import DownArrow from "../ui/DownArrow";
 
 const DictModal = () => {
   const [modal, setModal] = useState(false);
@@ -8,6 +11,7 @@ const DictModal = () => {
   const [lang, setLang] = useState("");
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
+  const [dropdownToggle, setDropdownToggle] = useState(false);
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -25,8 +29,6 @@ const DictModal = () => {
       setMessage("Definition must be at most 50 characters long");
     } else if (sentence.length > 100) {
       setMessage("Sentence must be at most 100 characters long");
-    } else if (lang.length > 20) {
-      setMessage("Lang must be at most 20 characters long");
     } else {
       const res = await fetch("http://localhost:8080/dictionary", {
         method: "post",
@@ -119,16 +121,22 @@ const DictModal = () => {
                   Current chararacter count: {sentence.length}
                 </p>
               )}
-              <label>Specify language (optional)</label>
-              <input
-                type="text"
-                value={lang}
-                onChange={(e) => setLang(e.target.value)}
-              />
-              {lang && (
-                <p className="text-sm text-purple-800">
-                  Current chararacter count: {lang.length}
-                </p>
+              <div
+                className="flex flex-row items-center hover:cursor-pointer"
+                onClick={() => setDropdownToggle(!dropdownToggle)}
+              >
+                <label>Select language</label>
+                {dropdownToggle ? <UpArrow /> : <DownArrow />}
+              </div>
+              {dropdownToggle && (
+                <Dropdown
+                  options={["None", "Spanish", "Korean"]}
+                  setOption={setLang}
+                  setToggle={setDropdownToggle}
+                />
+              )}
+              {!dropdownToggle && lang != "None" && lang != "" && (
+                <p className="text-violet-800">{`Language: ${lang}`}</p>
               )}
               {message && (
                 <p className="text-red-600 flex text-center">{message}</p>
