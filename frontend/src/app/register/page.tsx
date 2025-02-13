@@ -8,6 +8,7 @@ const Page = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [pwlen, setPwlen] = useState(0);
+  const [usernameLen, setUsernameLen] = useState(0);
   const [confirmPw, setConfirmPw] = useState("");
   const [message, setMessage] = useState("");
   const [visibleOne, setVisibleOne] = useState(false);
@@ -18,6 +19,8 @@ const Page = () => {
     if (confirmPw != password) setMessage("Passwords don't match");
     else if (password.length < 8)
       setMessage("Password must be of at least length 8");
+    else if (username.length > 12)
+      setMessage("Username must be at most 12 characters");
     else {
       try {
         const res = await fetch("http://localhost:8080/register", {
@@ -44,20 +47,31 @@ const Page = () => {
     setPwlen(e.target.value.length);
   };
 
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    setUsernameLen(e.target.value.length);
+  };
+
   return (
     <>
       <Navbar username={""} />
       <div className="flex flex-col justify-center items-center mt-32 ">
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
           <div className="flex flex-col">
             <label>Username</label>{" "}
             <input
               type="text"
               value={username}
               className="text-black w-[25vh]"
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
               required
             />
+            <p className="text-sm text-blue-100 mt-1">
+              Must be at most 12 characters
+            </p>
+            <p className="text-sm text-blue-100">
+              Current length: {usernameLen}
+            </p>
           </div>
           <div className="flex flex-col">
             <label>Password</label>{" "}
@@ -76,7 +90,7 @@ const Page = () => {
                 {visibleOne ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
               </p>
             </div>
-            <p className="text-sm text-blue-100  mt-1">
+            <p className="text-sm text-blue-100 mt-1">
               Must be at least 8 characters
             </p>
             <p className="text-sm text-blue-100">Current length: {pwlen}</p>

@@ -1,9 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Diff from "../components/Configs";
-import Result from "../components/Result";
+import GameWords from "../components/GameWords";
 import AddDict from "../components/GameAddDict";
 import Navbar from "../ui/Navbar";
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
@@ -64,7 +67,9 @@ const Game = () => {
   }, [wordInfo]);
 
   return (
-    <div className="flex flex-col space-y-8 mx-auto items-center w-full mb-16">
+    <div
+      className={`flex flex-col space-y-8 mx-auto items-center w-full mb-16 ${roboto.className}`}
+    >
       <Navbar username={username} />
       <div className="mt-4">
         Current difficulty:{" "}
@@ -80,7 +85,7 @@ const Game = () => {
             <div key={index}>
               {Object.entries(word).map(([key, value]) =>
                 key != "freq" && key != "diff" ? (
-                  <div key={key}>
+                  <div className="text-lg" key={key}>
                     <strong>{key}: </strong>
                     {value}
                   </div>
@@ -90,7 +95,7 @@ const Game = () => {
           ))}
         </div>
       ) : (
-        <Result
+        <GameWords
           options={options}
           wordInfo={wordInfo}
           streak={streak}
@@ -99,7 +104,7 @@ const Game = () => {
           setStreak={setStreak}
           lang={lang}
           diff={diff}
-        ></Result>
+        ></GameWords>
       )}
       {answered && answered == "Correct!" ? (
         <p className="text-green-400">{answered}</p>

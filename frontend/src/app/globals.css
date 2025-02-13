@@ -59,7 +59,7 @@ body {
 .logout-dropdown-container {
   background-color: rgba(0, 0, 0, 0.6);
   box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);
-  transition: all linear 0.3s;
+  border-radius: 25px;
 }
 
 .logout-dropdown {
@@ -73,8 +73,8 @@ body {
   transition: all linear 0.3s;
 }
 
-.logout-dropdown li:hover {
-  background: rgba(107, 8, 286, 0.5);
+.logout-dropdown-container:hover {
+  background: rgba(198, 153, 247, 0.8);
   cursor: pointer;
-  color: #fff;
+  color: #000;
 }

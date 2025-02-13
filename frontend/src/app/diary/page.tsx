@@ -4,6 +4,9 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 import Entry from "./Entry";
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
 
 const BackArrow = () => {
   return (
@@ -125,15 +128,17 @@ const Diary = () => {
   return (
     <div>
       <Navbar username={username} />
-      {searchEntries.length == 0 && (
-        <Entry
-          searchTags={searchTags}
-          setSearchTags={setSearchTags}
-          handleTagSearch={handleTagSearch}
-          day={curDay}
-        />
-      )}
-      {searchEntries.length > 0 && <SearchEntriesDisplay />}
+      <div className={roboto.className}>
+        {searchEntries.length == 0 && (
+          <Entry
+            searchTags={searchTags}
+            setSearchTags={setSearchTags}
+            handleTagSearch={handleTagSearch}
+            day={curDay}
+          />
+        )}
+        {searchEntries.length > 0 && <SearchEntriesDisplay />}
+      </div>
     </div>
   );
 };

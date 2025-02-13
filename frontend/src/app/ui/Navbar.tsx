@@ -5,6 +5,9 @@ import { X, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserIcon from "../ui/UserIcon";
+import { Lato } from "next/font/google";
+
+const lato = Lato({ subsets: ["latin"], weight: ["400"] });
 
 const LogoutDropdown = () => {
   const router = useRouter();
@@ -43,9 +46,24 @@ const LogoutDropdown = () => {
 const Navlinks = () => {
   return (
     <div className="md:space-x-16 flex md:flex-row md:space-y-0 flex-col space-y-4 items-center">
-      <Link href="/diary">Diary</Link>
-      <Link href="/game">Game</Link>
-      <Link href="/dict">Dictionary</Link>
+      <Link className="relative" href="/diary">
+        <p className="hover:text-indigo-200 transition ease-in-out duration-200 ">
+          Diary
+        </p>
+        <div className="absolute mt-2 bg-indigo-100 w-full h-[4px]" />
+      </Link>
+      <Link
+        className="hover:text-indigo-200 transition ease-in-out duration-200"
+        href="/game"
+      >
+        Game
+      </Link>
+      <Link
+        className="hover:text-indigo-200 transition ease-in-out duration-200"
+        href="/dict"
+      >
+        Words
+      </Link>
     </div>
   );
 };
@@ -63,11 +81,20 @@ const Navbar = ({ username }: Props) => {
   };
 
   return (
-    <header className="top-0 bg-violet-950/50 flex-wrap z-[20] mx-auto flex w-full items-center justify-between p-8">
+    <header
+      className={`top-0 bg-violet-950/50 flex-wrap z-[20] relative flex w-full justify-between p-8 text-lg ${lato.className}`}
+    >
+      <div className="hidden md:flex absolute flex items-center justify-center inset-0">
+        <Navlinks />
+      </div>
       <nav className="w-full">
-        <div className="hidden w-5/6 md:flex space-x-32 justify-between items-center mx-auto">
-          <Link href="/">Yanguages</Link>
-          <Navlinks />
+        <div className="hidden w-5/6 md:flex space-x-32 justify-between mx-auto">
+          <Link
+            className="relative hover:text-indigo-200 transition ease-in-out duration-200"
+            href="/"
+          >
+            Yanguages
+          </Link>
           {username ? (
             <div className="flex flex-row items-center space-x-2">
               <UserIcon />
@@ -92,7 +119,12 @@ const Navbar = ({ username }: Props) => {
       </nav>
       {isOpen && (
         <div className="md:hidden flex flex-col items-center basis-full space-y-4">
-          <Link href="/">Yanguages</Link>
+          <Link
+            className="hover:text-indigo-200 transition ease-in-out duration-200"
+            href="/"
+          >
+            Yanguages
+          </Link>
           <Navlinks />
           {username ? (
             <div className="flex flex-row space-x-2 items-center">

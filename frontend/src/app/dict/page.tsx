@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 import DictItem from "../components/DictItem";
 import DictModal from "../components/AddDictModal";
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
 
 const Dict = () => {
   const [dictWords, setDictWords] = useState([]);
@@ -75,7 +78,9 @@ const Dict = () => {
   return (
     <div>
       <Navbar username={username} />
-      <div className="flex flex-col items-center justify-center mx-auto mt-8">
+      <div
+        className={`flex flex-col items-center justify-center mx-auto mt-8 ${roboto.className}`}
+      >
         <div className="mb-4">
           <p>
             <b>My personal dictionary: </b>
