@@ -8,5 +8,5 @@ WordsAPI, Google Translate API, MySQL, Next.js + Tailwind, Node.js, Axios, Passp
 
 # Example Image of Game
 
-<img width="1440" alt="Screenshot 2024-12-24 at 11 57 05 PM" src="https://github.com/user-attachments/assets/d28ad464-48c1-4e27-bd78-1525ca8449ee" />
+<img width="1393" alt="Screenshot 2025-02-14 at 5 04 17 PM" src="https://github.com/user-attachments/assets/207aefa5-7c01-42d9-b104-39b73851823d" />
 Top right corner displays user's username.
