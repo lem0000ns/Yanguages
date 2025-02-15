@@ -50,7 +50,7 @@ const Navlinks = () => {
         <p className="hover:text-indigo-200 transition ease-in-out duration-200 ">
           Diary
         </p>
-        <div className="absolute mt-2 bg-indigo-100 w-full h-[4px]" />
+        {/* <div className="absolute mt-2 bg-indigo-100 w-full h-[4px]" /> */}
       </Link>
       <Link
         className="hover:text-indigo-200 transition ease-in-out duration-200"
@@ -108,7 +108,9 @@ const Navbar = ({ username }: Props) => {
               </div>
             </div>
           ) : (
-            <Link href="/login">Login</Link>
+            <Link className="relative" href="/login">
+              Login
+            </Link>
           )}
         </div>
         <div className="md:hidden">

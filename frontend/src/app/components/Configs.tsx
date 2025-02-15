@@ -6,7 +6,7 @@ const Configs = ({ setDiff, setLang }) => {
   const [username, setUsername] = useState("");
   const [scores, setScores] = useState([]);
   const [langScores, setLangScores] = useState([[]]);
-  const languages = ["Spanish", "Korean"];
+  const languages = ["Spanish", "Korean", "Chinese"];
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -26,7 +26,6 @@ const Configs = ({ setDiff, setLang }) => {
     const groupScores = [];
     let curScores = [];
     const temp = Object.keys(scores);
-    console.log(scores);
     // separating scores into groups of 3 (for each language)
     for (let i = 0; i < temp.length; i++) {
       const key = temp[i];
@@ -69,10 +68,15 @@ const Configs = ({ setDiff, setLang }) => {
         <p className="hover:cursor-pointer" onClick={() => setLang("kr")}>
           Korean
         </p>
+        <p className="hover:cursor-pointer" onClick={() => setLang("zh")}>
+          Chinese
+        </p>
       </div>
       {langScores.length > 0 ? (
         <div className="flex flex-col mx-auto items-center justify-center mt-16 space-y-4">
-          <b className="text-4xl text-sky-100 mb-4">High Scores</b>
+          <b className="text-4xl text-sky-100 mb-4 border-t border-b p-2 md:w-[500px] w-[300px] flex justify-center">
+            High Scores
+          </b>
           {langScores.map((lang, i) => (
             <div key={i}>
               <b className="flex justify-center mx-auto text-1xl">

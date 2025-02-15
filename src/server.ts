@@ -124,8 +124,11 @@ interface Score extends RowDataPacket {
   sp_med: number;
   sp_hard: number;
   kr_easy: number;
-  kr_medd: number;
+  kr_med: number;
   kr_hard: number;
+  zh_easy: number;
+  zh_med: number;
+  zh_hard: number;
 }
 
 app.get("/", (req, res) => {
@@ -145,6 +148,7 @@ const getAPIword = async (diff: string, res) => {
       english: result.english,
       spanish: result.spanish,
       korean: result.korean,
+      chinese: result.chinese,
       freq: result.freq,
       diff: result.diff,
       pronunciation: result.pronunciation,
@@ -181,7 +185,7 @@ app.get("/api/word", (req, res) => getAPIword("", res));
 app.get(`/highscore/:username`, async (req, res) => {
   try {
     const username = req.params.username;
-    const query = `SELECT sp_easy, sp_med, sp_hard, kr_easy, kr_med, kr_hard FROM usrs WHERE username="${username}"`;
+    const query = `SELECT sp_easy, sp_med, sp_hard, kr_easy, kr_med, kr_hard, zh_easy, zh_med, zh_hard FROM usrs WHERE username="${username}"`;
     const [results] = await usr_pool.query<Score[]>(query);
     res.json(results);
   } catch (e) {

@@ -49,6 +49,7 @@ const Game = () => {
         setWordInfo(data);
         if (lang == "sp") setWord(data[0].spanish);
         else if (lang == "kr") setWord(data[0].korean);
+        else if (lang == "zh") setWord(data[0].chinese);
         setLoading(false);
         setAnswered("");
       });

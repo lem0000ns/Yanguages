@@ -3,6 +3,7 @@ import axios from "axios";
 import fs from "fs";
 import translate from "translate";
 import csv from "csv-parser";
+import { franc } from "franc-min";
 
 // configuration variables
 const lld_pw = process.env.LLD_PW;
@@ -21,7 +22,7 @@ async function translateWord(word: string) {
   try {
     const spanish = await translate("the " + word, { to: "es" });
     const korean = await translate("the " + word, { to: "ko" });
-    return [spanish, korean, word];
+    return [spanish, korean];
   } catch (error) {
     return null;
   }
@@ -101,4 +102,44 @@ async function readCSV() {
   console.log("Data inserted into table");
 }
 
-readCSV();
+async function addLang(lang: string, code: string) {
+  return new Promise<void>((resolve, reject) => {
+    const csvStream = fs.createReadStream("nounlist.csv").pipe(csv());
+    const newTranslations = [];
+    csvStream.on("data", async (row) => {
+      const p = new Promise(async () => {
+        try {
+          let translation = await translate("the " + row.english_word, {
+            to: `${code}`,
+          });
+          let detectedLang = await franc(translation);
+          if (detectedLang != "cmn") {
+            translation = await translate(row.english_word, {
+              to: `${code}`,
+            });
+          }
+          const query = `UPDATE words SET ${lang}=\"${translation}\" WHERE english = \"${row.english_word}\"`;
+          await pool.query(query);
+          console.log("translated", row.english_word);
+        } catch (e) {
+          console.log("failed translating", row.english_word);
+          console.error(e);
+        }
+      });
+      newTranslations.push(p);
+    });
+    csvStream.on("end", async () => {
+      try {
+        await Promise.all(newTranslations);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
+// readCSV();
+// addLang("chinese", "zh");
+const temp = await translate("grub", { to: "zh" });
+console.log(temp);
