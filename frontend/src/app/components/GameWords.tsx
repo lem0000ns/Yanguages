@@ -19,7 +19,7 @@ const Result = ({
   }, []);
 
   return (
-    <div className="text-lg">
+    <div>
       <b className="flex justify-center mx-auto">{word}</b>
       <div className="flex flex-row mx-auto space-x-4 justify-center mt-4">
         {options.map((item, index) => (

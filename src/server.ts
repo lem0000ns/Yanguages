@@ -39,10 +39,10 @@ passport.use(
   new LocalStrategy(async function verify(username, password, done) {
     try {
       const result = await usr_pool.query(
-        `SELECT * FROM usrs WHERE username = '${username}'`
+        "SELECT * FROM usrs WHERE username = ?",
+        [username]
       );
       if ((<any>result[0]).length == 0) {
-        console.log("Incorrect username");
         return done(null, false, { message: "Incorrect username" });
       }
       const user = result[0];
@@ -76,7 +76,8 @@ passport.deserializeUser(async (id, done) => {
   try {
     // find user in database with corresponding id
     const result = await usr_pool.query(
-      `SELECT * FROM usrs WHERE id = ${id} LIMIT 1`
+      "SELECT * FROM usrs WHERE id = ? LIMIT 1",
+      [id]
     );
     if ((<any>result[0]).length == 0) {
       return done(null, false);
@@ -93,14 +94,14 @@ app.post("/login", passport.authenticate("local"), (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  console.log("Received a POST request to /register");
   try {
     const { username, password } = req.body;
-    console.log(username);
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const query = `INSERT INTO usrs (username, password) VALUES ('${username}', '${hashedPassword}')`;
-    await usr_pool.query(query);
+    await usr_pool.query(
+      "INSERT INTO usrs (username, password) VALUES (?, ?)",
+      [username, hashedPassword]
+    );
     res.status(200).json({ message: "User registered into database" });
   } catch (e) {
     console.error("Error:", e.message);
@@ -132,18 +133,22 @@ interface Score extends RowDataPacket {
 }
 
 app.get("/", (req, res) => {
-  console.log("HI");
+  console.log("Listening");
 });
 
 const getAPIword = async (diff: string, res) => {
+  let results: Word[] = [];
   try {
-    let query = "";
     if (diff != "") {
-      query = `SELECT * FROM words WHERE diff = '${diff}' ORDER BY RAND() LIMIT 1`;
+      [results] = await lld_pool.query<Word[]>(
+        "SELECT * FROM words WHERE diff = ? ORDER BY RAND() LIMIT 1",
+        [diff]
+      );
     } else {
-      query = `SELECT * FROM words ORDER BY RAND() LIMIT 1`;
+      [results] = await lld_pool.query<Word[]>(
+        "SELECT * FROM words ORDER BY RAND() LIMIT 1"
+      );
     }
-    const [results] = await lld_pool.query<Word[]>(query);
     const words = results.map((result) => ({
       english: result.english,
       spanish: result.spanish,
@@ -161,10 +166,12 @@ const getAPIword = async (diff: string, res) => {
   }
 };
 
-const getAnswers = async (diff: string, res) => {
+const getOptions = async (diff: string, res) => {
   try {
-    const query = `SELECT * FROM words WHERE diff = '${diff}' ORDER BY RAND() LIMIT 3`;
-    const [results] = await lld_pool.query<Word[]>(query);
+    const [results] = await lld_pool.query<Word[]>(
+      "SELECT * FROM words WHERE diff = ? ORDER BY RAND() LIMIT 3",
+      [diff]
+    );
     const words = results.map((result) => ({
       english: result.english,
     }));
@@ -177,16 +184,18 @@ const getAnswers = async (diff: string, res) => {
 app.get("/api/word/easy", (req, res) => getAPIword("easy", res));
 app.get("/api/word/med", (req, res) => getAPIword("med", res));
 app.get("/api/word/hard", (req, res) => getAPIword("hard", res));
-app.get("/api/answers/easy", (req, res) => getAnswers("easy", res));
-app.get("/api/answers/med", (req, res) => getAnswers("med", res));
-app.get("/api/answers/hard", (req, res) => getAnswers("hard", res));
+app.get("/api/options/easy", (req, res) => getOptions("easy", res));
+app.get("/api/options/med", (req, res) => getOptions("med", res));
+app.get("/api/options/hard", (req, res) => getOptions("hard", res));
 app.get("/api/word", (req, res) => getAPIword("", res));
 
 app.get(`/highscore/:username`, async (req, res) => {
   try {
     const username = req.params.username;
-    const query = `SELECT sp_easy, sp_med, sp_hard, kr_easy, kr_med, kr_hard, zh_easy, zh_med, zh_hard FROM usrs WHERE username="${username}"`;
-    const [results] = await usr_pool.query<Score[]>(query);
+    const [results] = await usr_pool.query<Score[]>(
+      "SELECT sp_easy, sp_med, sp_hard, kr_easy, kr_med, kr_hard, zh_easy, zh_med, zh_hard FROM usrs WHERE username = ?",
+      [username]
+    );
     res.json(results);
   } catch (e) {
     console.error("Error, ", e);
@@ -196,14 +205,17 @@ app.get(`/highscore/:username`, async (req, res) => {
 app.post("/highscore", async (req, res) => {
   try {
     const { lang, diff, streak, username } = req.body;
+    const mode = lang + "_" + diff;
     const result = await usr_pool.query(
-      `SELECT ${lang}_${diff} FROM usrs WHERE username = "${username}"`
+      `SELECT ${mode} FROM usrs WHERE username = ?`,
+      [username]
     );
     const curScore = result[0][0][`${lang}_${diff}`];
     if (streak > curScore) {
-      await usr_pool.query(
-        `UPDATE usrs SET ${lang}_${diff} = ${streak} WHERE username = "${username}"`
-      );
+      await usr_pool.query(`UPDATE usrs SET ${mode} = ? WHERE username = ?`, [
+        streak,
+        username,
+      ]);
       res.status(200).json({ message: "High score successfully updated" });
     } else {
       res.status(200).json({ message: "No high score update" });
@@ -218,7 +230,8 @@ app.post("/dictionary", async (req, res) => {
   try {
     const { username, term, define, sentence, lang } = req.body;
     await usr_pool.query(
-      `INSERT INTO dict (username, term, define, sentence, lang) VALUES ("${username}", "${term}", "${define}", "${sentence}", "${lang}")`
+      "INSERT INTO dict (username, term, define, sentence, lang) VALUES (?, ?, ?, ?, ?)",
+      [username, term, define, sentence, lang]
     );
     res.status(200).json({ message: "Added!" });
   } catch (e) {
@@ -232,7 +245,8 @@ app.put("/dictionary", async (req, res) => {
     const { id, username, term, define, sentence, lang } = req.body;
     const tempLang = lang == "None" ? "" : lang;
     await usr_pool.query(
-      `UPDATE dict SET term = "${term}", define = "${define}", sentence = "${sentence}", lang = "${tempLang}" WHERE id = ${id} AND username = "${username}"`
+      "UPDATE dict SET term = ?, define = ?, sentence = ?, lang = ? WHERE id = ? AND username = ?",
+      [term, define, sentence, tempLang, id, username]
     );
     res.status(200).json({ message: "Added!" });
   } catch (e) {
@@ -244,8 +258,10 @@ app.put("/dictionary", async (req, res) => {
 app.get("/dictionary/:username", async (req, res) => {
   try {
     const username = req.params.username;
-    const query = `SELECT id, term, define, sentence, lang FROM dict WHERE username = "${username}"`;
-    const results = await usr_pool.query(query);
+    const results = await usr_pool.query(
+      "SELECT id, term, define, sentence, lang FROM dict WHERE username = ?",
+      [username]
+    );
     res.json(results);
   } catch (e) {
     console.error("Error retrieving personal dictionary, ", e);
@@ -260,7 +276,7 @@ app.delete("/dictionary", async (req, res) => {
     if (deleteIds.length > 0) {
       const temp = deleteIds.map((num) => `id=${num}`);
       const tempS = temp.join(" OR ");
-      await usr_pool.query(`DELETE FROM dict WHERE ${tempS}`);
+      await usr_pool.query("DELETE FROM dict WHERE ?", [tempS]);
       res.status(200).json({ message: "Successfully deleted dictionary item" });
     } else {
       res.status(200).json({ message: "No dictionary items were deleted" });
@@ -279,33 +295,39 @@ app.post("/diary", async (req, res) => {
   try {
     const { username, title, entry, date, diaryTags } = req.body;
     const [rows, fields] = await usr_pool.query(
-      `SELECT * FROM diaries WHERE username="${username}" AND date="${date}"`
+      "SELECT * FROM diaries WHERE username = ? AND date = ?",
+      [username, date]
     );
     // already exists, update
     if (Array.isArray(rows) && rows.length > 0) {
       await usr_pool.query(
-        `UPDATE diaries SET title="${title}", entry="${entry}" WHERE username="${username}" AND date="${date}"`
+        "UPDATE diaries SET title = ?, entry = ? WHERE username = ? AND date = ?",
+        [title, entry, username, date]
       );
       // resetting tags
-      await usr_pool.query(
-        `DELETE FROM tags WHERE username="${username}" AND date="${date}"`
-      );
+      await usr_pool.query("DELETE FROM tags WHERE username = ? AND date = ?", [
+        username,
+        date,
+      ]);
     }
     // doesn't exist, insert
     else {
       await usr_pool.query(
-        `INSERT INTO diaries (username, title, entry, date) VALUES ("${username}", "${title}", "${entry}", "${date}")`
+        "INSERT INTO diaries (username, title, entry, date) VALUES (?, ?, ?, ?)",
+        [username, entry, title, date]
       );
     }
     // update tags by iterating through diaryTags
     const [temp] = await usr_pool.execute<Tag[]>(
-      `SELECT id FROM diaries WHERE username="${username}" AND date="${date}"`
+      "SELECT id FROM diaries WHERE username = ? AND date = ?",
+      [username, date]
     );
     if (Array.isArray(temp) && temp.length > 0) {
       const diaryId = temp[0].id;
       for (var i = 0; i < diaryTags.length; i++) {
         await usr_pool.query(
-          `INSERT INTO tags (diaryId, username, date, tag) VALUES (${diaryId}, "${username}", "${date}", "${diaryTags[i]}")`
+          "INSERT INTO tags (diaryId, username, date, tag) VALUES (?, ?, ?, ?)",
+          [diaryId, username, date, diaryTags[i]]
         );
       }
     }
@@ -325,8 +347,10 @@ app.get("/tags/", async (req, res) => {
       temp += `tags.tag="${searchTags[i]}" AND `;
     }
     temp = temp.substring(0, temp.length - 4);
-    const query = `SELECT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username="${username}" AND (${temp})`;
-    const results = await usr_pool.query(query);
+    const results = await usr_pool.query(
+      `SELECT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username=? AND (?)`,
+      [username, temp]
+    );
     res.status(200).json(results);
   } catch (e) {
     console.error("error retrieving diary entries with tags", e);
@@ -370,9 +394,10 @@ app.get("/diary/:username/:date", async (req, res) => {
 app.delete("/diary", async (req, res) => {
   try {
     const { username, date } = req.body;
-    await usr_pool.query(
-      `DELETE FROM diaries WHERE username="${username}" AND date="${date}"`
-    );
+    await usr_pool.query("DELETE FROM diaries WHERE username=? AND date=?", [
+      username,
+      date,
+    ]);
     res.status(200).json({ message: "Successfully deleted diary entry" });
   } catch (e) {
     res.status(500).json({ message: "Problem deleting diary entry" });

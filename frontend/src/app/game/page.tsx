@@ -57,7 +57,7 @@ const Game = () => {
   }, [newWords, diff, lang]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/answers/${diff}`)
+    fetch(`http://localhost:8080/api/options/${diff}`)
       .then((response) => response.json())
       .then((data) => {
         data.push({ english: wordInfo[0].english });
@@ -69,7 +69,7 @@ const Game = () => {
 
   return (
     <div
-      className={`flex flex-col space-y-8 mx-auto items-center w-full mb-16 ${roboto.className}`}
+      className={`flex flex-col space-y-8 mx-auto items-center w-full mb-16 text-xl ${roboto.className}`}
     >
       <Navbar username={username} />
       <div className="mt-4">
@@ -86,7 +86,7 @@ const Game = () => {
             <div key={index}>
               {Object.entries(word).map(([key, value]) =>
                 key != "freq" && key != "diff" ? (
-                  <div className="text-lg" key={key}>
+                  <div key={key}>
                     <strong>{key}: </strong>
                     {value}
                   </div>

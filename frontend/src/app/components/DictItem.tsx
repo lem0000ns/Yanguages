@@ -45,7 +45,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
 
     return (
       <>
-        <button className="btn-modal" onClick={toggleModal}>
+        <button className="text-sky-300 btn-modal" onClick={toggleModal}>
           <MdOutlineEdit className="absolute right-[-1vh] top-[-1vh]" />
         </button>
       </>
@@ -139,7 +139,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
               </div>
               {dropdownToggle && (
                 <Dropdown
-                  options={["None", "Spanish", "Korean"]}
+                  options={["None", "Spanish", "Korean", "Chinese"]}
                   setOption={setLang}
                   setToggle={setDropdownToggle}
                 />

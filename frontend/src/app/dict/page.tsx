@@ -81,7 +81,7 @@ const Dict = () => {
       <div
         className={`flex flex-col items-center justify-center mx-auto mt-8 ${roboto.className}`}
       >
-        <div className="mb-4">
+        <div className="mb-4 text-xl">
           <p>
             <b>My personal dictionary: </b>
             {dictWords ? dictWords.length : "0"} items

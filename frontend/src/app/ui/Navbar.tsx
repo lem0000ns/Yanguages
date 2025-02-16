@@ -36,7 +36,7 @@ const LogoutDropdown = () => {
 
   return (
     <div className="logout-dropdown-container absolute min-w-max">
-      <ul className="logout-dropdown flex">
+      <ul className="logout-dropdown flex text-lg">
         <li onClick={handleLogOut}>Log out</li>
       </ul>
     </div>
@@ -82,7 +82,7 @@ const Navbar = ({ username }: Props) => {
 
   return (
     <header
-      className={`top-0 bg-violet-950/50 flex-wrap z-[20] relative flex w-full justify-between p-8 text-lg ${lato.className}`}
+      className={`top-0 bg-violet-950/50 flex-wrap z-[20] relative flex w-full justify-between p-8 text-2xl ${lato.className}`}
     >
       <div className="hidden md:flex absolute flex items-center justify-center inset-0">
         <Navlinks />

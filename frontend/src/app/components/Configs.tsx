@@ -40,7 +40,7 @@ const Configs = ({ setDiff, setLang }) => {
   }, [scores]);
 
   return (
-    <div className="flex flex-col mx-auto">
+    <div className="flex flex-col mx-auto text-xl">
       <div className="flex flex-row space-x-4 mx-auto items-center justify-content">
         <p
           className="hover:cursor-pointer text-green-100 hover:text-green-200"
@@ -74,7 +74,7 @@ const Configs = ({ setDiff, setLang }) => {
       </div>
       {langScores.length > 0 ? (
         <div className="flex flex-col mx-auto items-center justify-center mt-16 space-y-4">
-          <b className="text-4xl text-sky-100 mb-4 border-t border-b p-2 md:w-[500px] w-[300px] flex justify-center">
+          <b className="text-4xl text-sky-100 mb-4 border-t border-b p-4 flex justify-center">
             High Scores
           </b>
           {langScores.map((lang, i) => (
