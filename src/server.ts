@@ -272,7 +272,6 @@ app.get("/dictionary/:username", async (req, res) => {
 app.delete("/dictionary", async (req, res) => {
   try {
     const { deleteIds } = req.body;
-    console.log(deleteIds);
     if (deleteIds.length > 0) {
       const temp = deleteIds.map((num) => `id=${num}`);
       const tempS = temp.join(" OR ");
@@ -348,8 +347,8 @@ app.get("/tags/", async (req, res) => {
     }
     temp = temp.substring(0, temp.length - 4);
     const results = await usr_pool.query(
-      `SELECT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username=? AND (?)`,
-      [username, temp]
+      `SELECT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username=? AND (${temp})`,
+      [username]
     );
     res.status(200).json(results);
   } catch (e) {
@@ -364,7 +363,6 @@ app.get("/diary/:username/:date", async (req, res) => {
   try {
     const username = req.params.username;
     const date = decodeURIComponent(req.params.date);
-    console.log(date);
     const [temp] = await usr_pool.execute<Tag[]>(
       "SELECT id, title, entry FROM diaries WHERE username = ? AND date = ?",
       [username, date]
@@ -382,7 +380,6 @@ app.get("/diary/:username/:date", async (req, res) => {
       const results = { ...temp, diaryTags };
       res.status(200).json(results);
     } else {
-      console.error("No diary for this date");
       res.status(500).json({ message: `No diary for ${date}` });
     }
   } catch (e) {
