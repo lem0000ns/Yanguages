@@ -5,6 +5,7 @@ import GameWords from "../components/GameWords";
 import AddDict from "../components/GameAddDict";
 import Navbar from "../ui/Navbar";
 import { Roboto } from "next/font/google";
+import { Tooltip } from "react-tooltip";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
 
@@ -85,10 +86,15 @@ const Game = () => {
           {wordInfo.map((word, index) => (
             <div key={index}>
               {Object.entries(word).map(([key, value]) =>
-                key != "freq" && key != "diff" ? (
+                key != "freq" && key != "diff" && key != "pinyin" ? (
                   <div key={key}>
                     <strong>{key}: </strong>
-                    {value}
+                    <a className={`${key == "chinese" ? "zh-section" : ""}`}>
+                      {value}
+                    </a>
+                    <Tooltip anchorSelect=".zh-section" place="top">
+                      {word.pinyin}
+                    </Tooltip>
                   </div>
                 ) : null
               )}

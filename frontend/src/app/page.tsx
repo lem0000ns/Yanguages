@@ -1,6 +1,7 @@
 "use client";
 import Navbar from "./ui/Navbar";
 import React, { useEffect, useState } from "react";
+import { Tooltip } from "react-tooltip";
 
 export default function Home() {
   const [wordInfo, setWordInfo] = useState([""]);
@@ -31,6 +32,10 @@ export default function Home() {
     }
   }, [newWord]);
 
+  useEffect(() => {
+    console.log(wordInfo);
+  }, [wordInfo]);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const today = new Date().toDateString();
@@ -57,16 +62,21 @@ export default function Home() {
           {wordInfo.map((word, index) => (
             <div className="text-center flex flex-col space-y-4" key={index}>
               {Object.entries(word).map(([key, value]) =>
-                key == "freq" ? null : (
+                key == "freq" || key == "pinyin" ? null : (
                   <div
                     className="text-xl hover:bg-violet-800/60 rounded-2xl p-1 transition duration-300 ease-in-out"
                     key={key}
                   >
                     <strong>{key}: </strong>
-                    {value}
+                    <a className={`${key == "chinese" ? "zh-section" : ""}`}>
+                      {value}
+                    </a>
                   </div>
                 )
               )}
+              <Tooltip anchorSelect=".zh-section" place="top">
+                {word.pinyin}
+              </Tooltip>
             </div>
           ))}
         </div>

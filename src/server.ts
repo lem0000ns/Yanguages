@@ -158,6 +158,7 @@ const getAPIword = async (diff: string, res) => {
       diff: result.diff,
       pronunciation: result.pronunciation,
       def: result.def,
+      pinyin: result.pinyin,
     }));
     res.json(words);
   } catch (error) {

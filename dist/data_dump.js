@@ -3,6 +3,8 @@ import axios from "axios";
 import fs from "fs";
 import translate from "translate";
 import csv from "csv-parser";
+import pinyinPkg from "pinyin";
+const pinyin = pinyinPkg.default;
 import { franc } from "franc-min";
 // configuration variables
 const lld_pw = process.env.LLD_PW;
@@ -109,7 +111,17 @@ async function addLang(lang, code) {
                             to: `${code}`,
                         });
                     }
-                    const query = `UPDATE words SET ${lang}=\"${translation}\" WHERE english = \"${row.english_word}\"`;
+                    let query = "";
+                    // include pinyin for chinese
+                    if (code != "zh") {
+                        query = `UPDATE words SET ${lang}=\"${translation}\" WHERE english = \"${row.english_word}\"`;
+                    }
+                    else {
+                        const PINYIN = await pinyin(translation, {
+                            segment: true,
+                        }).join(" ");
+                        query = `UPDATE words SET ${lang}=\"${translation}\", pinyin = "${PINYIN}" WHERE english = \"${row.english_word}\"`;
+                    }
                     await pool.query(query);
                     console.log("translated", row.english_word);
                 }
@@ -132,7 +144,5 @@ async function addLang(lang, code) {
     });
 }
 // readCSV();
-// addLang("chinese", "zh");
-const temp = await translate("grub", { to: "zh" });
-console.log(temp);
+addLang("chinese", "zh");
 //# sourceMappingURL=data_dump.js.map
