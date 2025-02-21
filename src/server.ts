@@ -270,6 +270,21 @@ app.get("/dictionary/:username", async (req, res) => {
   }
 });
 
+app.get("/dictionary/:lang/:username", async (req, res) => {
+  try {
+    const lang = req.params.lang.toLowerCase();
+    const username = req.params.username;
+    const results = await usr_pool.query(
+      "SELECT id, term, define, sentence, lang FROM dict WHERE username = ? AND lang = ?",
+      [username, lang]
+    );
+    res.json(results);
+  } catch (e) {
+    console.error("Error retrieving personal dictionary, ", e);
+    res.status(500).json({ message: "Error retrieving personal dictionary" });
+  }
+});
+
 app.delete("/dictionary", async (req, res) => {
   try {
     const { deleteIds } = req.body;

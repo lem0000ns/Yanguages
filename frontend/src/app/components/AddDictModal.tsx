@@ -130,7 +130,7 @@ const DictModal = () => {
               </div>
               {dropdownToggle && (
                 <Dropdown
-                  options={["None", "Spanish", "Korean"]}
+                  options={["None", "Spanish", "Korean", "Chinese"]}
                   setOption={setLang}
                   setToggle={setDropdownToggle}
                 />

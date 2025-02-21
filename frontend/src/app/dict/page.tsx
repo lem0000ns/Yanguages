@@ -12,6 +12,7 @@ const Dict = () => {
   const [username, setUsername] = useState("");
   const [remove, setRemove] = useState(0);
   const [deleteIds, setDeleteIds] = useState([]);
+  const [selectedLang, setSelectedLang] = useState("");
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -19,13 +20,25 @@ const Dict = () => {
 
   useEffect(() => {
     (async () => {
-      if (username && username != "") {
+      if (selectedLang == "" && username && username != "") {
         const res = await fetch(`http://localhost:8080/dictionary/${username}`);
         const data = await res.json();
         setDictWords(data[0]);
       }
     })();
-  }, [username]);
+  }, [username, selectedLang]);
+
+  const handleLangFilter = async () => {
+    if (selectedLang != "") {
+      if (username && username != "") {
+        const res = await fetch(
+          `http://localhost:8080/dictionary/${selectedLang}/${username}`
+        );
+        const data = await res.json();
+        setDictWords(data[0]);
+      }
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -81,12 +94,12 @@ const Dict = () => {
       <div
         className={`flex flex-col items-center justify-center mx-auto mt-8 ${roboto.className}`}
       >
-        <div className="mb-4 text-xl">
+        <div className="mb-4 text-xl text-center">
           <p>
             <b>My personal dictionary: </b>
             {dictWords ? dictWords.length : "0"} items
           </p>
-          <div className="w-3/4 flex justify-between mx-auto mt-3">
+          <div className="w-full space-x-8 flex justify-between mx-auto mt-3">
             <DictModal />
             <p
               className={`border border-sm rounded-md p-2 ${
@@ -98,6 +111,17 @@ const Dict = () => {
             >
               Remove
             </p>
+            <input
+              className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200"
+              value={selectedLang}
+              onChange={(e) => setSelectedLang(e.target.value)}
+              placeholder="Filter by language?"
+              onKeyDown={(e) => {
+                if (e.key == "Enter") {
+                  handleLangFilter();
+                }
+              }}
+            />
           </div>
         </div>
         <div className="w-full grid sm:grid-cols-4 grid-cols-3 gap-y-16">
