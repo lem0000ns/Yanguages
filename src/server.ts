@@ -18,12 +18,7 @@ const lld_pool = mysql.createPool({
   password: lld_pw,
   database: "lld",
 });
-// const lld_pool = mysql.createPool({
-//   host: "localhost",
-//   user: "root",
-//   password: lld_pw,
-//   database: "lld_usrs",
-// });
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
