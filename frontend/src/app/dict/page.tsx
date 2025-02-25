@@ -112,7 +112,7 @@ const Dict = () => {
               Remove
             </p>
             <input
-              className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200"
+              className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200 text-center"
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
               placeholder="Filter by language?"
@@ -141,7 +141,7 @@ const Dict = () => {
             ))}
         </div>
         {remove > 0 && (
-          <div className="relative mt-4 text-purple-200">
+          <div className="relative w-full flex justify-center mx-auto mt-32 text-purple-200">
             <p className="absolute">Press esc to exit remove mode</p>
           </div>
         )}

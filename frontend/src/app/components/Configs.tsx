@@ -84,7 +84,11 @@ const Configs = ({ setDiff, setLang }) => {
               </b>
               <p className="flex flex-row space-x-4">
                 {lang.map((diff, j) => (
-                  <span key={j}>{diff}</span>
+                  <span key={j}>
+                    {diff.substring(diff.length - 4) == "null"
+                      ? diff.substring(0, diff.length - 4) + "0"
+                      : diff}
+                  </span>
                 ))}
               </p>
             </div>
