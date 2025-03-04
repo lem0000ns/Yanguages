@@ -21,7 +21,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-    await fetch("http://localhost:8080/dictionary", {
+    await fetch("http://54.153.103.184/dictionary", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, username, term, define, sentence, lang }),

@@ -23,7 +23,7 @@ const Page = () => {
       setMessage("Username must be at most 12 characters");
     else {
       try {
-        const res = await fetch("http://localhost:8080/register", {
+        const res = await fetch("http://54.153.103.184/register", {
           method: "post",
           headers: {
             "Content-Type": "application/json",

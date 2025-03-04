@@ -33,7 +33,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
     const fetchDiary = async () => {
       if (username != "") {
         const res = await fetch(
-          `http://localhost:8080/diary/${username}/${encodeURIComponent(date)}`,
+          `http://54.153.103.184/diary/${username}/${encodeURIComponent(date)}`,
           {
             method: "GET",
             headers: {
@@ -67,7 +67,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
       if (username && (entry != "" || title != "")) {
         await localStorage.setItem("entry", entry);
         await localStorage.setItem("title", title);
-        const res = await fetch(`http://localhost:8080/diary`, {
+        const res = await fetch(`http://54.153.103.184/diary`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -78,7 +78,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           setSaving("Saved!");
         }
       } else if (date == day) {
-        const res = await fetch("http://localhost:8080/diary", {
+        const res = await fetch("http://54.153.103.184/diary", {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

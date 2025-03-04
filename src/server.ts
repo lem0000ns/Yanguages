@@ -10,10 +10,12 @@ import crypto from "crypto";
 import type { IGetUserAuthInfoRequest } from "./request.js";
 import bcrypt from "bcrypt";
 
+export const dynamic = "force-dynamic";
+
 // configuration variables
 const lld_pw = process.env.LLD_PW;
 const lld_pool = mysql.createPool({
-  host: "localhost",
+  host: "db-yanguages.c30igyqguxod.us-west-1.rds.amazonaws.com",
   user: "root",
   password: lld_pw,
   database: "lld",
@@ -24,7 +26,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(session({ secret: "secret", resave: false, saveUnitialized: false })); // middleware
+app.use(session({ secret: "secret", resave: false, saveUninitialized: false })); // middleware
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
@@ -129,6 +131,7 @@ interface Score extends RowDataPacket {
 
 app.get("/", (req, res) => {
   console.log("Listening");
+  res.send("Yanguages Backend Running");
 });
 
 const getAPIword = async (diff: string, res) => {

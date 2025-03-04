@@ -35,7 +35,7 @@ const Result = ({
                     `The correct answer was ${wordInfo[0].english}.\nYou answered ${streak} in a row correctly`
                   );
                   if (username) {
-                    fetch("http://localhost:8080/highscore", {
+                    fetch("http://54.153.103.184/highscore", {
                       method: "post",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ lang, diff, streak, username }),

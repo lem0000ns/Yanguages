@@ -13,7 +13,7 @@ const Page = () => {
     e.preventDefault();
     try {
       // logging out
-      const res = await fetch("http://localhost:8080/logout");
+      const res = await fetch("http://54.153.103.184/logout");
       if (res.ok) {
         localStorage.removeItem("username");
         localStorage.removeItem("entry");

@@ -18,7 +18,7 @@ const Page = () => {
 
     try {
       // logging in
-      const res = await fetch("http://localhost:8080/login", {
+      const res = await fetch("http://54.153.103.184/login", {
         method: "post",
         headers: {
           "Content-Type": "application/json",

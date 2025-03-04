@@ -44,7 +44,7 @@ const Game = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/word/${diff}`)
+    fetch(`http://54.153.103.184/api/word/${diff}`)
       .then((response) => response.json())
       .then((data) => {
         setWordInfo(data);
@@ -58,7 +58,7 @@ const Game = () => {
   }, [newWords, diff, lang]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/options/${diff}`)
+    fetch(`http://54.153.103.184/api/options/${diff}`)
       .then((response) => response.json())
       .then((data) => {
         data.push({ english: wordInfo[0].english });

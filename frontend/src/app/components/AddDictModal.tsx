@@ -30,7 +30,7 @@ const DictModal = () => {
     } else if (sentence.length > 100) {
       setMessage("Sentence must be at most 100 characters long");
     } else {
-      const res = await fetch("http://localhost:8080/dictionary", {
+      const res = await fetch("http://54.153.103.184/dictionary", {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, term, define, sentence, lang }),

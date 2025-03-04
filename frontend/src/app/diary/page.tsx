@@ -109,7 +109,7 @@ const Diary = () => {
           username: username,
           searchTags: searchTags.join(","),
         });
-        const res = await fetch(`http://localhost:8080/tags/?${queryParams}`, {
+        const res = await fetch(`http://54.153.103.184/tags/?${queryParams}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
