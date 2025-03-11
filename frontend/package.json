@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel-build": "tsc --version && next build"
+    "vercel-build": "tsc --version && node --version && next build"
   },
   "dependencies": {
     "@next/font": "^14.2.15",
@@ -33,6 +33,6 @@
     "typescript": "^5.6.3"
   },
   "engines": {
-    "node": "v23.6.0"
+    "node": "22.x"
   }
 }
