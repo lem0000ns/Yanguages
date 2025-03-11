@@ -15,7 +15,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   const [username, setUsername] = useState("");
   const [title, setTitle] = useState("");
   const [entry, setEntry] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date());
   const [saving, setSaving] = useState("");
   const [message, setMessage] = useState("");
   const [diaryTags, setDiaryTags] = useState<string[]>([]);
