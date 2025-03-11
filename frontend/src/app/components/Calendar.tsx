@@ -5,13 +5,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface Props {
-  day: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  day: string;
+  setDate: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Calendar = ({ day, setDate }: Props) => {
   const [selectedDate, setSelectedDate] = useState("");
-  const handleDateChange = (date: Date) => {
+  const handleDateChange = (date: string) => {
     const formattedDate = new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
