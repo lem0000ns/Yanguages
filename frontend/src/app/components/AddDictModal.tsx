@@ -14,7 +14,7 @@ const DictModal = () => {
   const [dropdownToggle, setDropdownToggle] = useState(false);
 
   useEffect(() => {
-    setUsername(localStorage.getItem("username"));
+    setUsername(localStorage.getItem("username") || "");
   }, []);
 
   const toggleModal = () => {
