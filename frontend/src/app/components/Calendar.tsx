@@ -4,14 +4,9 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-interface Props {
-  day: string;
-  setDate: React.Dispatch<React.SetStateAction<string>>;
-}
-
-const Calendar = ({ day, setDate }: Props) => {
+const Calendar = ({ day, setDate }: AppProps) => {
   const [selectedDate, setSelectedDate] = useState("");
-  const handleDateChange = (date: string) => {
+  const handleDateChange = (date) => {
     const formattedDate = new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
