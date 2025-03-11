@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { AppProps } from "next/app";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const Calendar = ({ day, setDate }: AppProps) => {
+interface Props {
+  day: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}
+
+const Calendar = ({ day, setDate }: Props) => {
   const [selectedDate, setSelectedDate] = useState("");
   const handleDateChange = (date) => {
     const formattedDate = new Date(date).toLocaleDateString("en-US", {
