@@ -15,7 +15,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   const [username, setUsername] = useState("");
   const [title, setTitle] = useState("");
   const [entry, setEntry] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState("");
   const [saving, setSaving] = useState("");
   const [message, setMessage] = useState("");
   const [diaryTags, setDiaryTags] = useState<string[]>([]);
@@ -32,6 +32,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   useEffect(() => {
     const fetchDiary = async () => {
       if (username != "") {
+        console.log(typeof date);
         const res = await fetch(
           `https://yanguages-production.up.railway.app/diary/${username}/${encodeURIComponent(
             date
