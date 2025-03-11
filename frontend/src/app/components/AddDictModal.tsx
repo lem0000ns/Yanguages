@@ -21,8 +21,7 @@ const DictModal = () => {
     setModal(!modal);
   };
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
+  const handleAdd = async () => {
     if (term.length > 30) {
       setMessage("Term must be at most 30 characters long");
     } else if (define.length > 30) {
