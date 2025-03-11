@@ -11,7 +11,7 @@ interface Props {
 
 const Calendar = ({ day, setDate }: Props) => {
   const [selectedDate, setSelectedDate] = useState("");
-  const handleDateChange = (date) => {
+  const handleDateChange = (date: Date) => {
     const formattedDate = new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
