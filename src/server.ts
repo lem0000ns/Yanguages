@@ -327,7 +327,7 @@ app.post("/diary", async (req, res) => {
     else {
       await lld_pool.query(
         "INSERT INTO diaries (username, title, entry, date) VALUES (?, ?, ?, ?)",
-        [username, entry, title, date]
+        [username, title, entry, date]
       );
     }
     // update tags by iterating through diaryTags

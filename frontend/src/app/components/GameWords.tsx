@@ -35,11 +35,14 @@ const Result = ({
                     `The correct answer was ${wordInfo[0].english}.\nYou answered ${streak} in a row correctly`
                   );
                   if (username) {
-                    fetch("http://54.153.103.184/highscore", {
-                      method: "post",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ lang, diff, streak, username }),
-                    });
+                    fetch(
+                      "https://yanguages-production.up.railway.app/highscore",
+                      {
+                        method: "post",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ lang, diff, streak, username }),
+                      }
+                    );
                   }
                   setStreak(0);
                 }

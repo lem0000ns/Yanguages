@@ -34,7 +34,6 @@ const Tags = ({ tags, addTags, removeTags, entry, title }: Props) => {
   };
 
   const handleRemove = (index) => {
-    console.log("index");
     removeTags(index);
     setCountTags(countTags - 1);
   };

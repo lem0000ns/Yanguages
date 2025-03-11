@@ -17,7 +17,9 @@ const LogoutDropdown = () => {
     e.preventDefault();
     try {
       // logging out
-      const res = await fetch("http://54.153.103.184/logout");
+      const res = await fetch(
+        "https://yanguages-production.up.railway.app/logout"
+      );
       if (res.ok) {
         localStorage.removeItem("username");
         localStorage.removeItem("entry");

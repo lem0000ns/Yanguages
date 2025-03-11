@@ -109,12 +109,15 @@ const Diary = () => {
           username: username,
           searchTags: searchTags.join(","),
         });
-        const res = await fetch(`http://54.153.103.184/tags/?${queryParams}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(
+          `https://yanguages-production.up.railway.app/tags/?${queryParams}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await res.json();
         if (res.ok) {
           setSearchEntries(data[0] || []);

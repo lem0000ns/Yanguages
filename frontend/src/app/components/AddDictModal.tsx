@@ -30,11 +30,14 @@ const DictModal = () => {
     } else if (sentence.length > 100) {
       setMessage("Sentence must be at most 100 characters long");
     } else {
-      const res = await fetch("http://54.153.103.184/dictionary", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, term, define, sentence, lang }),
-      });
+      const res = await fetch(
+        "https://yanguages-production.up.railway.app/dictionary",
+        {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, term, define, sentence, lang }),
+        }
+      );
       const data = await res.json();
       console.log(data.message);
       if (res.ok) {

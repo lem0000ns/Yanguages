@@ -18,13 +18,16 @@ const Page = () => {
 
     try {
       // logging in
-      const res = await fetch("http://54.153.103.184/login", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      const res = await fetch(
+        "https://yanguages-production.up.railway.app/login",
+        {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        }
+      );
       const data = await res.json();
       setMessage(data.message);
       localStorage.setItem("username", username);

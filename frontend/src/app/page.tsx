@@ -14,7 +14,7 @@ export default function Home() {
     if (today != storedDate) {
       localStorage.removeItem("entry");
       localStorage.removeItem("title");
-      fetch(`http://localhost:8080/api/word`)
+      fetch(`https://yanguages-production.up.railway.app/api/word`)
         .then((response) => {
           if (!response.ok) {
             throw new Error("Not able to connect to backend");

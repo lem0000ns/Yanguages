@@ -22,11 +22,14 @@ const AddDict = ({ term, define, lang }) => {
       console.log("Definition: ", define);
       console.log("Example sentence", sentence);
       console.log("Language: ", lang);
-      const res = await fetch("http://54.153.103.184/dictionary", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, term, define, sentence, lang }),
-      });
+      const res = await fetch(
+        "https://yanguages-production.up.railway.app/dictionary",
+        {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, term, define, sentence, lang }),
+        }
+      );
       const data = await res.json();
       setMessage(data.message);
     }

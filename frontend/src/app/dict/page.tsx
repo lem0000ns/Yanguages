@@ -21,7 +21,9 @@ const Dict = () => {
   useEffect(() => {
     (async () => {
       if (selectedLang == "" && username && username != "") {
-        const res = await fetch(`http://54.153.103.184/dictionary/${username}`);
+        const res = await fetch(
+          `https://yanguages-production.up.railway.app/dictionary/${username}`
+        );
         const data = await res.json();
         setDictWords(data[0]);
       }
@@ -32,7 +34,7 @@ const Dict = () => {
     if (selectedLang != "") {
       if (username && username != "") {
         const res = await fetch(
-          `http://54.153.103.184/dictionary/${selectedLang}/${username}`
+          `https://yanguages-production.up.railway.app/dictionary/${selectedLang}/${username}`
         );
         const data = await res.json();
         setDictWords(data[0]);
@@ -46,13 +48,16 @@ const Dict = () => {
         if (deleteIds.length == 0) {
           setRemove(0);
         } else {
-          const res = await fetch("http://54.153.103.184/dictionary", {
-            method: "delete",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ deleteIds }),
-          });
+          const res = await fetch(
+            "https://yanguages-production.up.railway.app/dictionary",
+            {
+              method: "delete",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ deleteIds }),
+            }
+          );
           const data = await res.json();
           if (res.ok) {
             console.log(data.message);

@@ -23,13 +23,16 @@ const Page = () => {
       setMessage("Username must be at most 12 characters");
     else {
       try {
-        const res = await fetch("http://54.153.103.184/register", {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        });
+        const res = await fetch(
+          "https://yanguages-production.up.railway.app/register",
+          {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          }
+        );
         if (res.ok) {
           setMessage("Registration successful!");
         } else {

@@ -15,7 +15,9 @@ const Configs = ({ setDiff, setLang }) => {
   useEffect(() => {
     (async () => {
       if (username && username != "") {
-        const res = await fetch(`http://54.153.103.184/highscore/${username}`);
+        const res = await fetch(
+          `https://yanguages-production.up.railway.app/highscore/${username}`
+        );
         const data = await res.json();
         setScores(data[0]);
       }
