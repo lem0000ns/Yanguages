@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Calendar = ({ day, setDate }) => {
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const handleDateChange = (date) => {
     const formattedDate = new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
