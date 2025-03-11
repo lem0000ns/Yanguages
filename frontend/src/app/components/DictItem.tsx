@@ -89,7 +89,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
                   : "whitespace-nowrap overflow-x-auto"
               }`}
             >
-              {value}
+              {value as React.ReactNode}
               <EditModal
                 id={word.id}
                 term={word.term}
