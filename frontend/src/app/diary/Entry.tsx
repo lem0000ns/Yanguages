@@ -145,7 +145,9 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         ></textarea>
         <Tags
           tags={diaryTags}
-          addTags={(event) => setDiaryTags([...diaryTags, event.target.value])}
+          addTags={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setDiaryTags([...diaryTags, event.target.value])
+          }
           removeTags={(indexToRemove) =>
             setDiaryTags(
               diaryTags.filter((_, index) => index !== indexToRemove)
