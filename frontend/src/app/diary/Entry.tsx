@@ -15,7 +15,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   const [username, setUsername] = useState("");
   const [title, setTitle] = useState("");
   const [entry, setEntry] = useState("");
-  const [date, setDate] = useState<Date>(new Date(Date.now()));
+  const [date, setDate] = useState<Date>(new Date());
   const [saving, setSaving] = useState("");
   const [message, setMessage] = useState("");
   const [diaryTags, setDiaryTags] = useState<string[]>([]);
@@ -32,7 +32,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   useEffect(() => {
     const fetchDiary = async () => {
       if (username != "") {
-        console.log(typeof date);
+        console.log("type of date:", typeof date);
         const formattedDate = date.toLocaleDateString("en-US", {
           year: "numeric",
           month: "2-digit",
@@ -51,10 +51,8 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         );
         const data = await res.json();
         if (res.ok) {
-          console.log("entry", data[0].entry);
           if (data[0].entry != "undefined") setEntry(data[0].entry);
           else setEntry("");
-          console.log("title", data[0].title);
           if (data[0].title != "undefined") setTitle(data[0].title);
           else setTitle("");
           setDiaryTags(data.diaryTags || []);
@@ -117,7 +115,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           <Calendar day={day} setDate={setDate} />
           <SearchTags
             tags={searchTags}
-            addTags={(event) =>
+            addTags={(event: React.ChangeEvent<HTMLInputElement>) =>
               setSearchTags([...searchTags, event.target.value])
             }
             removeTags={(indexToRemove) =>

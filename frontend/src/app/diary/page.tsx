@@ -32,13 +32,7 @@ const Diary = () => {
   const [username, setUsername] = useState("");
   const [searchTags, setSearchTags] = useState<string[]>([]);
   const [searchEntries, setSearchEntries] = useState<>([]); // stores each diary entry as json object
-  const [curDay, setCurDay] = useState(
-    new Date().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    })
-  );
+  const [curDay, setCurDay] = useState<Date>(new Date());
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -52,13 +46,7 @@ const Diary = () => {
   const handleView = (date, title, entry) => {
     localStorage.setItem("entry", entry);
     localStorage.setItem("title", title);
-    setCurDay(
-      new Date(date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-    );
+    setCurDay(new Date(date));
     setSearchEntries([]);
     setSearchTags([]);
   };
