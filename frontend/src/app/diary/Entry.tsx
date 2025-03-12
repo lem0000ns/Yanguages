@@ -124,7 +124,6 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
               )
             }
             handleTagSearch={handleTagSearch}
-            placeholder="search by tag?"
           />
         </div>
       </div>
