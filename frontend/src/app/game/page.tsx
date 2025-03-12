@@ -28,9 +28,7 @@ function shuffle(array) {
 }
 
 const Game = () => {
-  const [wordInfo, setWordInfo] = useState<Record<string, string>>({
-    english: "...",
-  });
+  const [wordInfo, setWordInfo] = useState();
   const [word, setWord] = useState("");
   const [answered, setAnswered] = useState("");
   const [newWords, setNewWords] = useState(false);
@@ -60,7 +58,7 @@ const Game = () => {
   }, [newWords, diff, lang]);
 
   useEffect(() => {
-    if (wordInfo[0]) {
+    if (wordInfo) {
       fetch(`https://yanguages-production.up.railway.app/api/options/${diff}`)
         .then((response) => response.json())
         .then((data) => {
