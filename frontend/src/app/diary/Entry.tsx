@@ -155,7 +155,6 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           }
           entry={entry}
           title={title}
-          placeholder="add tags?"
         />
         {saving && !message && (
           <div className="flex justify-center mx-auto text-emerald-200 mt-3 font-bold">
