@@ -28,7 +28,9 @@ function shuffle(array) {
 }
 
 const Game = () => {
-  const [wordInfo, setWordInfo] = useState(["Loading"]);
+  const [wordInfo, setWordInfo] = useState<Record<string, string>>({
+    english: "...",
+  });
   const [word, setWord] = useState("");
   const [answered, setAnswered] = useState("");
   const [newWords, setNewWords] = useState(false);
@@ -58,13 +60,15 @@ const Game = () => {
   }, [newWords, diff, lang]);
 
   useEffect(() => {
-    fetch(`https://yanguages-production.up.railway.app/api/options/${diff}`)
-      .then((response) => response.json())
-      .then((data) => {
-        data.push({ english: wordInfo[0].english });
-        shuffle(data);
-        setOptions(data);
-      });
+    if (wordInfo[0]) {
+      fetch(`https://yanguages-production.up.railway.app/api/options/${diff}`)
+        .then((response) => response.json())
+        .then((data) => {
+          data.push({ english: wordInfo[0].english });
+          shuffle(data);
+          setOptions(data);
+        });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordInfo]);
 
