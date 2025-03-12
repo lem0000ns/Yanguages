@@ -31,7 +31,7 @@ const BackArrow = () => {
 const Diary = () => {
   const [username, setUsername] = useState("");
   const [searchTags, setSearchTags] = useState<string[]>([]);
-  const [searchEntries, setSearchEntries] = useState<>([]); // stores each diary entry as json object
+  const [searchEntries, setSearchEntries] = useState([]); // stores each diary entry as json object
   const [curDay, setCurDay] = useState<Date>(new Date());
 
   useEffect(() => {
