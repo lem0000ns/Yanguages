@@ -13,6 +13,7 @@ const Dict = () => {
   const [remove, setRemove] = useState(0);
   const [deleteIds, setDeleteIds] = useState([]);
   const [selectedLang, setSelectedLang] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setUsername(localStorage.getItem("username"));
@@ -26,6 +27,7 @@ const Dict = () => {
         );
         const data = await res.json();
         setDictWords(data[0]);
+        setLoading(false);
       }
     })();
   }, [username, selectedLang]);
@@ -102,7 +104,11 @@ const Dict = () => {
         <div className="mb-4 text-xl text-center">
           <p>
             <b>My personal dictionary: </b>
-            {dictWords ? dictWords.length : "0"} items
+            {dictWords
+              ? `${dictWords.length} items`
+              : loading
+              ? "Loading..."
+              : "0 items"}
           </p>
           <div className="w-full space-x-8 flex justify-between mx-auto mt-3">
             <DictModal />
