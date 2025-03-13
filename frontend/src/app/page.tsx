@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Tooltip } from "react-tooltip";
 
 export default function Home() {
-  const [wordInfo, setWordInfo] = useState([""]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [wordInfo, setWordInfo] = useState<any[]>();
   const [newWord, setNewWord] = useState(true);
   const [username, setUsername] = useState("");
 
@@ -59,26 +60,27 @@ export default function Home() {
           Word of the day!
         </div>
         <div className="flex lg:w-1/5 w-2/3">
-          {wordInfo.map((word, index) => (
-            <div className="text-center flex flex-col space-y-4" key={index}>
-              {Object.entries(word).map(([key, value]) =>
-                key == "freq" || key == "pinyin" ? null : (
-                  <div
-                    className="text-xl hover:bg-violet-800/60 rounded-2xl p-1 transition duration-300 ease-in-out"
-                    key={key}
-                  >
-                    <strong>{key}: </strong>
-                    <a className={`${key == "chinese" ? "zh-section" : ""}`}>
-                      {value}
-                    </a>
-                  </div>
-                )
-              )}
-              <Tooltip anchorSelect=".zh-section" place="top">
-                {word.pinyin}
-              </Tooltip>
-            </div>
-          ))}
+          {wordInfo &&
+            wordInfo.map((word, index) => (
+              <div className="text-center flex flex-col space-y-4" key={index}>
+                {Object.entries(word).map(([key, value]) =>
+                  key == "freq" || key == "pinyin" ? null : (
+                    <div
+                      className="text-xl hover:bg-violet-800/60 rounded-2xl p-1 transition duration-300 ease-in-out"
+                      key={key}
+                    >
+                      <strong>{key}: </strong>
+                      <a className={`${key == "chinese" ? "zh-section" : ""}`}>
+                        {value}
+                      </a>
+                    </div>
+                  )
+                )}
+                <Tooltip anchorSelect=".zh-section" place="top">
+                  {word.pinyin}
+                </Tooltip>
+              </div>
+            ))}
         </div>
       </div>
     </div>
