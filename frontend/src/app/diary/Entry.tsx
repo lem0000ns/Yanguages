@@ -116,7 +116,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username, date }),
+            body: JSON.stringify({ username, date: formattedDay }),
           }
         );
         if (res.ok) {
