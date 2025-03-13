@@ -20,7 +20,6 @@ const Page = () => {
         localStorage.removeItem("username");
         localStorage.removeItem("entry");
         localStorage.removeItem("title");
-        console.log(res.json().message);
         setMessage("Logged out successfully!");
       } else {
         setMessage("Problem occured in logout....");
