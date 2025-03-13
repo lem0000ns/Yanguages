@@ -21,7 +21,6 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   const [diaryTags, setDiaryTags] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log("a");
     setUsername(localStorage.getItem("username"));
     setEntry(localStorage.getItem("entry") || "");
     setTitle(localStorage.getItem("title") || "");
@@ -31,7 +30,6 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   }, [day]);
 
   useEffect(() => {
-    console.log("b");
     const fetchDiary = async () => {
       if (username != "") {
         const formattedDate = date.toLocaleDateString("en-US", {
@@ -72,8 +70,17 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   }, [date]);
 
   useEffect(() => {
-    console.log("c");
     setSaving(". . .");
+    const formattedDate = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const formattedDay = day.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
     const intervalId = setInterval(async () => {
       if (username && (entry != "" || title != "")) {
         await localStorage.setItem("entry", entry);
@@ -81,11 +88,6 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         console.log("title", title);
         console.log(localStorage.getItem("title"));
         // update formatted date
-        const formattedDate = date.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        });
         const res = await fetch(
           `https://yanguages-production.up.railway.app/diary`,
           {
@@ -106,7 +108,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           console.log(res);
           setSaving("Saved!");
         }
-      } else if (date == day) {
+      } else if (formattedDate == formattedDay) {
         const res = await fetch(
           "https://yanguages-production.up.railway.app/diary",
           {
