@@ -26,9 +26,16 @@ interface Props {
   addTags: (e: unknown) => void;
   removeTags: (e: unknown) => void;
   handleTagSearch: (e: unknown) => void;
+  username: string;
 }
 
-const Tags = ({ tags, addTags, removeTags, handleTagSearch }: Props) => {
+const Tags = ({
+  tags,
+  addTags,
+  removeTags,
+  handleTagSearch,
+  username,
+}: Props) => {
   const [curTag, setCurTag] = useState("");
   const [message, setMessage] = useState("");
   const [countTags, setCountTags] = useState(0);
@@ -56,11 +63,11 @@ const Tags = ({ tags, addTags, removeTags, handleTagSearch }: Props) => {
   };
 
   return (
-    <div className="flex items-center md:w-1/3 w-1/2 relative">
-      <ul className="m-0 flex flex-row gap-x-2 w-full rounded-3xl bg-indigo-950 overflow-x-auto flex-nowrap absolute mb-2 bottom-full">
+    <div className="flex flex-col sm:flex-row items-center md:w-1/3 w-1/2 relative">
+      <ul className="m-0 flex flex-row gap-x-2 w-full rounded-3xl bg-indigo-950 sm:absolute overflow-x-auto flex-nowrap mb-2 bottom-full">
         {tags.map((value, index) => (
           <li
-            className="list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer flex-shrink-0"
+            className="list-none px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer flex-shrink-0"
             onClick={() => {
               handleRemove(index);
             }}
@@ -70,18 +77,24 @@ const Tags = ({ tags, addTags, removeTags, handleTagSearch }: Props) => {
           </li>
         ))}
       </ul>
-      <input
-        className="flex w-full rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
-        placeholder="search by tag?"
-        value={curTag}
-        onChange={(e) => setCurTag(e.target.value)}
-        onKeyDown={handleEnter}
-      />
-      <div className="ml-2 hover:cursor-pointer" onClick={handleTagSearch}>
-        <MagnifyingGlass />
+      <div className="flex flex-row">
+        <input
+          className="flex w-full rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
+          placeholder="search by tag?"
+          value={curTag}
+          onChange={(e) => setCurTag(e.target.value)}
+          onKeyDown={handleEnter}
+          disabled={username ? false : true}
+        />
+        <div className="ml-2 hover:cursor-pointer" onClick={handleTagSearch}>
+          <MagnifyingGlass />
+        </div>
       </div>
       {message && (
-        <div className="flex absolute items-center justify-center mx-auto text-red-200 top-full">
+        <div
+          className="mt-4 flex sm:absolute items-center justify-center mx-auto text-red-200 top-full hover:cursor-pointer"
+          onClick={() => setMessage("")}
+        >
           {message}
         </div>
       )}

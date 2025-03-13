@@ -144,6 +144,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
               )
             }
             handleTagSearch={handleTagSearch}
+            username={username}
           />
         </div>
       </div>
@@ -151,7 +152,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         <input
           type="text"
           placeholder="title?"
-          className="text-white text-left bg-indigo-950 rounded-xl md:w-3/5 w-2/3 p-2"
+          className="text-white text-left bg-indigo-950 rounded-xl w-1/3 p-2"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           disabled={!username || message.length > 0 ? true : false}
