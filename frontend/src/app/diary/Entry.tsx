@@ -80,6 +80,12 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         await localStorage.setItem("title", title);
         console.log("title", title);
         console.log(localStorage.getItem("title"));
+        // update formatted date
+        const formattedDate = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
         const res = await fetch(
           `https://yanguages-production.up.railway.app/diary`,
           {
@@ -87,7 +93,13 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username, title, entry, date, diaryTags }),
+            body: JSON.stringify({
+              username,
+              title,
+              entry,
+              date: formattedDate,
+              diaryTags,
+            }),
           }
         );
         if (res.ok) {
