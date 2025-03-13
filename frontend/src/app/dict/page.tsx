@@ -111,10 +111,10 @@ const Dict = () => {
                 ? "Loading..."
                 : "0 items"}
             </p>
-            <div className="w-1/3 space-x-8 flex justify-center mx-auto mt-3">
+            <div className="sm:space-x-8 space-x-2 flex justify-center mx-auto mt-3">
               <DictModal />
               <p
-                className={`border border-sm rounded-md p-2 ${
+                className={`sm:border border-sm rounded-md p-2 ${
                   remove <= 1 && deleteIds.length == 0
                     ? "text-red-400 border-red-200"
                     : "text-red-600 border-red-400"
@@ -124,7 +124,7 @@ const Dict = () => {
                 Remove
               </p>
               <input
-                className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200 text-center"
+                className="border border-sm rounded-md bg-black text-blue-400 border-blue-200 text-center"
                 value={selectedLang}
                 onChange={(e) => setSelectedLang(e.target.value)}
                 placeholder="Specify lang"

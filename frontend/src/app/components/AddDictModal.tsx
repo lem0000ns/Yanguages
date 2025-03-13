@@ -73,7 +73,7 @@ const DictModal = () => {
     <div>
       <button
         onClick={toggleModal}
-        className="btn-modal border border-sm rounded-md p-2 text-green-400 border-green-200 hover:cursor-pointer"
+        className="btn-modal sm:border border-sm rounded-md p-2 text-green-400 border-green-200 hover:cursor-pointer"
       >
         Add
       </button>
