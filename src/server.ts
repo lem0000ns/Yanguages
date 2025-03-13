@@ -233,6 +233,7 @@ app.post("/dictionary", async (req, res) => {
       [username, term, define, sentence, lang]
     );
     res.status(200).json({ message: "Added!" });
+    console.log(`Added term ${term} to dictionary for ${username}`);
   } catch (e) {
     console.error("Error updating personal dictionary, ", e);
     res.status(500).json({ message: "Error updating personal dictionary" });
