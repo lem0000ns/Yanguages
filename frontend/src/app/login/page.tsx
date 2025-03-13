@@ -11,7 +11,8 @@ const Page = () => {
   const [message, setMessage] = useState("");
   const [visible, setVisible] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       // logging in
       const res = await fetch(
