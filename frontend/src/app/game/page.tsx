@@ -28,7 +28,8 @@ function shuffle(array) {
 }
 
 const Game = () => {
-  const [wordInfo, setWordInfo] = useState<never[]>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [wordInfo, setWordInfo] = useState<any[]>();
   const [word, setWord] = useState("");
   const [answered, setAnswered] = useState("");
   const [newWords, setNewWords] = useState(false);
