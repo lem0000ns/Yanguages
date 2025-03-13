@@ -106,7 +106,7 @@ const Dict = () => {
             <b>My personal dictionary: </b>
             {dictWords && dictWords.length > 0
               ? `${dictWords.length} items`
-              : loading
+              : username && loading
               ? "Loading..."
               : "0 items"}
           </p>

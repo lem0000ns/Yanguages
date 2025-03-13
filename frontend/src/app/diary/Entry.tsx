@@ -154,14 +154,14 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           className="text-white text-left bg-indigo-950 rounded-xl md:w-3/5 w-2/3 p-2"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          disabled={message.length > 0 ? true : false}
+          disabled={!username || message.length > 0 ? true : false}
         ></input>
         <textarea
           placeholder="write here!"
           className="mt-2 rounded-3xl text-white bg-indigo-950 h-64 p-3"
           value={entry}
           onChange={(e) => setEntry(e.target.value)}
-          disabled={message.length > 0 ? true : false}
+          disabled={!username || message.length > 0 ? true : false}
         ></textarea>
         <Tags
           tags={diaryTags}
