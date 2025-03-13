@@ -103,7 +103,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           setSaving("Saved!");
         }
       }
-    }, 2000);
+    }, 1000);
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entry, title, diaryTags]);

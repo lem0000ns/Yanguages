@@ -110,7 +110,7 @@ const Dict = () => {
               ? "Loading..."
               : "0 items"}
           </p>
-          <div className="w-full space-x-8 flex justify-between mx-auto mt-3">
+          <div className="w-1/3 space-x-8 flex justify-center mx-auto mt-3">
             <DictModal />
             <p
               className={`border border-sm rounded-md p-2 ${
@@ -126,7 +126,7 @@ const Dict = () => {
               className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200 text-center"
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
-              placeholder="Filter by language?"
+              placeholder="Specify lang"
               onKeyDown={(e) => {
                 if (e.key == "Enter") {
                   handleLangFilter();
