@@ -129,7 +129,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   }, [entry, title, diaryTags]);
   return (
     <div>
-      <div className="flex flex-col items-left mx-auto md:w-2/3 w-4/5 mt-16 space-y-4">
+      <div className="flex flex-col items-left mx-auto sm:w-2/3 w-5/6 mt-16 space-y-4">
         <h1 className="text-2xl ml-4">Dear diary...</h1>
         <div className="flex flex-row items-center justify-between w-full">
           <Calendar day={day} setDate={setDate} />
@@ -147,7 +147,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           />
         </div>
       </div>
-      <div className="flex flex-col mx-auto items-left mx-auto md:w-2/3 w-4/5 mt-4">
+      <div className="flex flex-col mx-auto items-left mx-auto sm:w-2/3 w-5/6 mt-4">
         <input
           type="text"
           placeholder="title?"
