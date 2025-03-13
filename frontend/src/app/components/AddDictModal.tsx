@@ -21,11 +21,12 @@ const DictModal = () => {
     setModal(!modal);
   };
 
-  const handleAdd = async () => {
+  const handleAdd = async (e) => {
+    e.preventDefault();
     if (term.length > 30) {
       setMessage("Term must be at most 30 characters long");
     } else if (define.length > 30) {
-      setMessage("Definition must be at most 50 characters long");
+      setMessage("Definition must be at most 30 characters long");
     } else if (sentence.length > 100) {
       setMessage("Sentence must be at most 100 characters long");
     } else {
@@ -37,8 +38,6 @@ const DictModal = () => {
           body: JSON.stringify({ username, term, define, sentence, lang }),
         }
       );
-      const data = await res.json();
-      console.log(data.message);
       if (res.ok) {
         setModal(false);
         location.reload();
