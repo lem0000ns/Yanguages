@@ -104,7 +104,7 @@ const Dict = () => {
         <div className="mb-4 text-xl text-center">
           <p>
             <b>My personal dictionary: </b>
-            {dictWords
+            {dictWords && dictWords.length > 0
               ? `${dictWords.length} items`
               : loading
               ? "Loading..."
