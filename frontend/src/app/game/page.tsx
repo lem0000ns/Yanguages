@@ -95,7 +95,7 @@ const Game = () => {
                   <div key={key}>
                     <strong>{key}: </strong>
                     <a className={`${key == "chinese" ? "zh-section" : ""}`}>
-                      {value}
+                      {value as React.ReactNode}
                     </a>
                     <Tooltip anchorSelect=".zh-section" place="top">
                       {word.pinyin}
