@@ -188,7 +188,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         )}
       </div>
       {!username && (
-        <div className="flex justify-center mx-auto text-sky-100 mt-12">
+        <div className="flex text-xl justify-center mx-auto text-sky-100 mt-12">
           Log in to write diaries!
         </div>
       )}

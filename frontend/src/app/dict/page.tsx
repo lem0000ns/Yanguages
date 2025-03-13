@@ -98,65 +98,73 @@ const Dict = () => {
   return (
     <div>
       <Navbar username={username} />
-      <div
-        className={`flex flex-col items-center justify-center mx-auto mt-8 ${roboto.className}`}
-      >
-        <div className="mb-4 text-xl text-center">
-          <p>
-            <b>My personal dictionary: </b>
-            {dictWords && dictWords.length > 0
-              ? `${dictWords.length} items`
-              : username && loading
-              ? "Loading..."
-              : "0 items"}
-          </p>
-          <div className="w-1/3 space-x-8 flex justify-center mx-auto mt-3">
-            <DictModal />
-            <p
-              className={`border border-sm rounded-md p-2 ${
-                remove <= 1 && deleteIds.length == 0
-                  ? "text-red-400 border-red-200"
-                  : "text-red-600 border-red-400"
-              } hover:cursor-pointer`}
-              onClick={handleRemove}
-            >
-              Remove
+      {username ? (
+        <div
+          className={`flex flex-col items-center justify-center mx-auto mt-8 ${roboto.className}`}
+        >
+          <div className="mb-4 text-xl text-center">
+            <p>
+              <b>My personal dictionary: </b>
+              {dictWords && dictWords.length > 0
+                ? `${dictWords.length} items`
+                : username && loading
+                ? "Loading..."
+                : "0 items"}
             </p>
-            <input
-              className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200 text-center"
-              value={selectedLang}
-              onChange={(e) => setSelectedLang(e.target.value)}
-              placeholder="Specify lang"
-              onKeyDown={(e) => {
-                if (e.key == "Enter") {
-                  handleLangFilter();
-                }
-              }}
-            />
-          </div>
-        </div>
-        <div className="w-full grid sm:grid-cols-4 grid-cols-3 gap-y-16">
-          {dictWords &&
-            dictWords.map((word, index) => (
-              <div
-                className="w-4/5 flex flex-col justify-center items-center mx-auto mt-12 relative"
-                key={index}
+            <div className="w-1/3 space-x-8 flex justify-center mx-auto mt-3">
+              <DictModal />
+              <p
+                className={`border border-sm rounded-md p-2 ${
+                  remove <= 1 && deleteIds.length == 0
+                    ? "text-red-400 border-red-200"
+                    : "text-red-600 border-red-400"
+                } hover:cursor-pointer`}
+                onClick={handleRemove}
               >
-                <DictItem
-                  deleteIds={deleteIds}
-                  setDeleteIds={setDeleteIds}
-                  word={word}
-                  remove={remove}
-                />
-              </div>
-            ))}
-        </div>
-        {remove > 0 && (
-          <div className="relative w-full flex justify-center mx-auto mt-32 text-purple-200">
-            <p className="absolute">Press esc to exit remove mode</p>
+                Remove
+              </p>
+              <input
+                className="border border-sm rounded-md bg-black p-1 text-blue-400 border-blue-200 text-center"
+                value={selectedLang}
+                onChange={(e) => setSelectedLang(e.target.value)}
+                placeholder="Specify lang"
+                onKeyDown={(e) => {
+                  if (e.key == "Enter") {
+                    handleLangFilter();
+                  }
+                }}
+              />
+            </div>
           </div>
-        )}
-      </div>
+          <div className="w-full grid sm:grid-cols-4 grid-cols-3 gap-y-16">
+            {dictWords &&
+              dictWords.map((word, index) => (
+                <div
+                  className="w-4/5 flex flex-col justify-center items-center mx-auto mt-12 relative"
+                  key={index}
+                >
+                  <DictItem
+                    deleteIds={deleteIds}
+                    setDeleteIds={setDeleteIds}
+                    word={word}
+                    remove={remove}
+                  />
+                </div>
+              ))}
+          </div>
+          {remove > 0 && (
+            <div className="relative w-full flex justify-center mx-auto mt-32 text-purple-200">
+              <p className="absolute">Press esc to exit remove mode</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p
+          className={`flex text-xl text-sky-100 justify-center mx-auto mt-32 ${roboto.className}`}
+        >
+          Log in to manage personal dictionary!
+        </p>
+      )}
     </div>
   );
 };
