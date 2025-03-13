@@ -131,7 +131,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
     <div>
       <div className="flex flex-col items-left mx-auto sm:w-2/3 w-5/6 mt-16 space-y-4">
         <h1 className="text-2xl ml-4">Dear diary...</h1>
-        <div className="flex flex-row items-center justify-between w-full">
+        <div className="flex sm:flex-row sm:items-center sm:justify-between sm:space-y-0 space-y-4 flex-col items-left w-full">
           <Calendar day={day} setDate={setDate} />
           <SearchTags
             tags={searchTags}
