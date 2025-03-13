@@ -71,7 +71,7 @@ export default function Home() {
                     >
                       <strong>{key}: </strong>
                       <a className={`${key == "chinese" ? "zh-section" : ""}`}>
-                        {value}
+                        {value as React.ReactNode}
                       </a>
                     </div>
                   )
