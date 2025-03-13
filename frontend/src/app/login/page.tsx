@@ -11,11 +11,7 @@ const Page = () => {
   const [message, setMessage] = useState("");
   const [visible, setVisible] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(`Username entered: ${username}`);
-    console.log(`Password entered: ${password}`);
-
+  const handleSubmit = async () => {
     try {
       // logging in
       const res = await fetch(
