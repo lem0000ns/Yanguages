@@ -21,6 +21,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   const [diaryTags, setDiaryTags] = useState<string[]>([]);
 
   useEffect(() => {
+    console.log("a");
     setUsername(localStorage.getItem("username"));
     setEntry(localStorage.getItem("entry") || "");
     setTitle(localStorage.getItem("title") || "");
@@ -30,9 +31,9 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   }, [day]);
 
   useEffect(() => {
+    console.log("b");
     const fetchDiary = async () => {
       if (username != "") {
-        console.log("type of date:", typeof date);
         const formattedDate = date.toLocaleDateString("en-US", {
           year: "numeric",
           month: "2-digit",
@@ -50,6 +51,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           }
         );
         const data = await res.json();
+        console.log(data);
         if (res.ok) {
           if (data[0].entry != "undefined") setEntry(data[0].entry);
           else setEntry("");
@@ -70,11 +72,14 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
   }, [date]);
 
   useEffect(() => {
+    console.log("c");
     setSaving(". . .");
     const intervalId = setInterval(async () => {
       if (username && (entry != "" || title != "")) {
         await localStorage.setItem("entry", entry);
         await localStorage.setItem("title", title);
+        console.log("title", title);
+        console.log(localStorage.getItem("title"));
         const res = await fetch(
           `https://yanguages-production.up.railway.app/diary`,
           {
@@ -86,6 +91,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           }
         );
         if (res.ok) {
+          console.log(res);
           setSaving("Saved!");
         }
       } else if (date == day) {

@@ -376,7 +376,7 @@ app.get("/tags/", async (req, res) => {
 app.get("/diary/:username/:date", async (req, res) => {
   try {
     const username = req.params.username;
-    const date = decodeURIComponent(req.params.date);
+    const date = req.params.date;
     const [temp] = await lld_pool.execute<Tag[]>(
       "SELECT id, title, entry FROM diaries WHERE username = ? AND date = ?",
       [username, date]
