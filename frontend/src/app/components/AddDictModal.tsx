@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Dropdown from "../ui/Dropdown";
 import UpArrow from "../ui/UpArrow";
 import DownArrow from "../ui/DownArrow";
+import { API_URL } from "../config";
 
 const DictModal = () => {
   const [modal, setModal] = useState(false);
@@ -31,7 +32,7 @@ const DictModal = () => {
       setMessage("Sentence must be at most 100 characters long");
     } else {
       const res = await fetch(
-        "https://yanguages-production.up.railway.app/dictionary",
+        `${API_URL}/dictionary`,
         {
           method: "post",
           headers: { "Content-Type": "application/json" },

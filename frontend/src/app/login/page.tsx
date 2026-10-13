@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Navbar from "../ui/Navbar";
+import { API_URL } from "../config";
 
 const Page = () => {
   const [username, setUsername] = useState("");
@@ -16,7 +17,7 @@ const Page = () => {
     try {
       // logging in
       const res = await fetch(
-        "https://yanguages-production.up.railway.app/login",
+        `${API_URL}/login`,
         {
           method: "post",
           headers: {

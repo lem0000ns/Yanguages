@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 import DictItem from "../components/DictItem";
 import DictModal from "../components/AddDictModal";
+import { API_URL } from "../config";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
@@ -23,7 +24,7 @@ const Dict = () => {
     (async () => {
       if (selectedLang == "" && username && username != "") {
         const res = await fetch(
-          `https://yanguages-production.up.railway.app/dictionary/${username}`
+          `${API_URL}/dictionary/${username}`
         );
         const data = await res.json();
         setDictWords(data[0]);
@@ -36,7 +37,7 @@ const Dict = () => {
     if (selectedLang != "") {
       if (username && username != "") {
         const res = await fetch(
-          `https://yanguages-production.up.railway.app/dictionary/${selectedLang}/${username}`
+          `${API_URL}/dictionary/${selectedLang}/${username}`
         );
         const data = await res.json();
         setDictWords(data[0]);
@@ -51,7 +52,7 @@ const Dict = () => {
           setRemove(0);
         } else {
           const res = await fetch(
-            "https://yanguages-production.up.railway.app/dictionary",
+            `${API_URL}/dictionary`,
             {
               method: "delete",
               headers: {

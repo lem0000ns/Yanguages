@@ -3,6 +3,7 @@ import { MdOutlineEdit } from "react-icons/md";
 import Dropdown from "../ui/Dropdown";
 import UpArrow from "../ui/UpArrow";
 import DownArrow from "../ui/DownArrow";
+import { API_URL } from "../config";
 
 const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
   const [username, setUsername] = useState("");
@@ -21,7 +22,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
-    await fetch("https://yanguages-production.up.railway.app/dictionary", {
+    await fetch(`${API_URL}/dictionary`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, username, term, define, sentence, lang }),

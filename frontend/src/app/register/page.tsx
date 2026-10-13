@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Navbar from "../ui/Navbar";
+import { API_URL } from "../config";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Page = () => {
@@ -24,7 +25,7 @@ const Page = () => {
     else {
       try {
         const res = await fetch(
-          "https://yanguages-production.up.railway.app/register",
+          `${API_URL}/register`,
           {
             method: "post",
             headers: {

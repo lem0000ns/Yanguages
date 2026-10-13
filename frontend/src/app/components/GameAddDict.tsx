@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { API_URL } from "../config";
 
 const AddDict = ({ term, define, lang }) => {
   const [username, setUsername] = useState("");
@@ -23,7 +24,7 @@ const AddDict = ({ term, define, lang }) => {
       console.log("Example sentence", sentence);
       console.log("Language: ", lang);
       const res = await fetch(
-        "https://yanguages-production.up.railway.app/dictionary",
+        `${API_URL}/dictionary`,
         {
           method: "post",
           headers: { "Content-Type": "application/json" },

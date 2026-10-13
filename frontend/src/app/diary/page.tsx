@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../ui/Navbar";
 import Entry from "./Entry";
+import { API_URL } from "../config";
 import { Roboto } from "next/font/google";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
@@ -98,7 +99,7 @@ const Diary = () => {
           searchTags: searchTags.join(","),
         });
         const res = await fetch(
-          `https://yanguages-production.up.railway.app/tags/?${queryParams}`,
+          `${API_URL}/tags/?${queryParams}`,
           {
             method: "GET",
             headers: {

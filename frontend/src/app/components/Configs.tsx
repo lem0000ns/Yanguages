@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { API_URL } from "../config";
 
 const Configs = ({ setDiff, setLang }) => {
   const [username, setUsername] = useState("");
@@ -16,7 +17,7 @@ const Configs = ({ setDiff, setLang }) => {
     (async () => {
       if (username && username != "") {
         const res = await fetch(
-          `https://yanguages-production.up.railway.app/highscore/${username}`
+          `${API_URL}/highscore/${username}`
         );
         const data = await res.json();
         setScores(data[0]);

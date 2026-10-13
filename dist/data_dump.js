@@ -10,7 +10,7 @@ import { franc } from "franc-min";
 const lld_pw = process.env.LLD_PW;
 const pool = mysql
     .createPool({
-    host: "localhost",
+    host: "db-yanguages.c30igyqguxod.us-west-1.rds.amazonaws.com",
     user: "root",
     password: lld_pw,
     database: "lld",

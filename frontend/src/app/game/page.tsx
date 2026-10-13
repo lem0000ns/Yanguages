@@ -4,6 +4,7 @@ import Diff from "../components/Configs";
 import GameWords from "../components/GameWords";
 import AddDict from "../components/GameAddDict";
 import Navbar from "../ui/Navbar";
+import { API_URL } from "../config";
 import { Roboto } from "next/font/google";
 import { Tooltip } from "react-tooltip";
 
@@ -45,7 +46,7 @@ const Game = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`https://yanguages-production.up.railway.app/api/word/${diff}`)
+    fetch(`${API_URL}/api/word/${diff}`)
       .then((response) => response.json())
       .then((data) => {
         setWordInfo(data);
@@ -62,7 +63,7 @@ const Game = () => {
     if (wordInfo) {
       console.log(typeof wordInfo);
       console.log(typeof wordInfo[0]);
-      fetch(`https://yanguages-production.up.railway.app/api/options/${diff}`)
+      fetch(`${API_URL}/api/options/${diff}`)
         .then((response) => response.json())
         .then((data) => {
           data.push({ english: wordInfo[0].english });

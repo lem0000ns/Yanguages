@@ -5,6 +5,7 @@ import { X, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserIcon from "../ui/UserIcon";
+import { API_URL } from "../config";
 import { Lato } from "next/font/google";
 
 const lato = Lato({ subsets: ["latin"], weight: ["400"] });
@@ -18,7 +19,7 @@ const LogoutDropdown = () => {
     try {
       // logging out
       const res = await fetch(
-        "https://yanguages-production.up.railway.app/logout"
+        `${API_URL}/logout`
       );
       if (res.ok) {
         localStorage.removeItem("username");

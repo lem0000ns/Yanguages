@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../ui/Navbar";
+import { API_URL } from "../config";
 
 const Page = () => {
   const [username, setUsername] = useState("");
@@ -14,7 +15,7 @@ const Page = () => {
     try {
       // logging out
       const res = await fetch(
-        "https://yanguages-production.up.railway.app/logout"
+        `${API_URL}/logout`
       );
       if (res.ok) {
         localStorage.removeItem("username");

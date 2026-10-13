@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_URL } from "../config";
 
 const Result = ({
   options,
@@ -36,7 +37,7 @@ const Result = ({
                   );
                   if (username) {
                     fetch(
-                      "https://yanguages-production.up.railway.app/highscore",
+                      `${API_URL}/highscore`,
                       {
                         method: "post",
                         headers: { "Content-Type": "application/json" },

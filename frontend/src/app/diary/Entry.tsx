@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Calendar from "../components/Calendar";
 import Tags from "../components/Tags";
 import SearchTags from "../components/SearchTags";
+import { API_URL } from "../config";
 
 interface Props {
   searchTags: string[];
@@ -38,7 +39,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
           day: "2-digit",
         });
         const res = await fetch(
-          `https://yanguages-production.up.railway.app/diary/${username}/${encodeURIComponent(
+          `${API_URL}/diary/${username}/${encodeURIComponent(
             formattedDate
           )}`,
           {
@@ -89,7 +90,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         console.log(localStorage.getItem("title"));
         // update formatted date
         const res = await fetch(
-          `https://yanguages-production.up.railway.app/diary`,
+          `${API_URL}/diary`,
           {
             method: "POST",
             headers: {
@@ -110,7 +111,7 @@ const Entry = ({ searchTags, setSearchTags, handleTagSearch, day }: Props) => {
         }
       } else if (formattedDate == formattedDay) {
         const res = await fetch(
-          "https://yanguages-production.up.railway.app/diary",
+          `${API_URL}/diary`,
           {
             method: "DELETE",
             headers: {

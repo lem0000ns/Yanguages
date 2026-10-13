@@ -1,5 +1,6 @@
 "use client";
 import Navbar from "./ui/Navbar";
+import { API_URL } from "./config";
 import React, { useEffect, useState } from "react";
 import { Tooltip } from "react-tooltip";
 
@@ -15,7 +16,7 @@ export default function Home() {
     if (today != storedDate) {
       localStorage.removeItem("entry");
       localStorage.removeItem("title");
-      fetch(`https://yanguages-production.up.railway.app/api/word`)
+      fetch(`${API_URL}/api/word`)
         .then((response) => {
           if (!response.ok) {
             throw new Error("Not able to connect to backend");
