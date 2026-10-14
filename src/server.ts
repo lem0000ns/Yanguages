@@ -27,17 +27,35 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const allowedOrigins = [
-  process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
-  "http://127.0.0.1:3000",
+  ...new Set([
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://www.yanguages.com",
+    "https://yanguages.com",
+    ...(process.env.FRONTEND_ORIGIN ? [process.env.FRONTEND_ORIGIN] : []),
+    ...(process.env.FRONTEND_ORIGINS?.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean) ?? []),
+  ]),
 ];
+
+const crossSiteFrontend =
+  process.env.CROSS_SITE_COOKIES === "true" ||
+  process.env.NODE_ENV === "production" ||
+  Boolean(process.env.RAILWAY_ENVIRONMENT);
+
+if (crossSiteFrontend) {
+  app.set("trust proxy", 1);
+}
 
 app.use(
   cors({
     origin(origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+        callback(null, origin ?? true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        console.warn("CORS blocked origin:", origin);
+        callback(null, false);
       }
     },
     credentials: true,
@@ -50,8 +68,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: crossSiteFrontend ? "none" : "lax",
+      secure: crossSiteFrontend,
     },
   })
 );
