@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Dropdown from "../ui/Dropdown";
 import UpArrow from "../ui/UpArrow";
 import DownArrow from "../ui/DownArrow";
-import { API_URL } from "../config";
+import { apiFetch } from "../session";
+import { Plus } from "lucide-react";
 
 const DictModal = () => {
   const [modal, setModal] = useState(false);
@@ -10,13 +11,8 @@ const DictModal = () => {
   const [define, setDefine] = useState("");
   const [sentence, setSentence] = useState("");
   const [lang, setLang] = useState("");
-  const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
   const [dropdownToggle, setDropdownToggle] = useState(false);
-
-  useEffect(() => {
-    setUsername(localStorage.getItem("username") || "");
-  }, []);
 
   const toggleModal = () => {
     setModal(!modal);
@@ -31,14 +27,11 @@ const DictModal = () => {
     } else if (sentence.length > 100) {
       setMessage("Sentence must be at most 100 characters long");
     } else {
-      const res = await fetch(
-        `${API_URL}/dictionary`,
-        {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, term, define, sentence, lang }),
-        }
-      );
+      const res = await apiFetch("/dictionary", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ term, define, sentence, lang }),
+      });
       if (res.ok) {
         setModal(false);
         location.reload();
@@ -48,86 +41,65 @@ const DictModal = () => {
     }
   };
 
-  const CloseModal = () => {
-    return (
-      <button className="close-modal" onClick={toggleModal}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-x"
-        >
-          <path d="M18 6 6 18" />
-          <path d="m6 6 12 12" />
-        </svg>
-      </button>
-    );
-  };
-
   return (
     <div>
-      <button
-        onClick={toggleModal}
-        className="btn-modal sm:border border-sm rounded-md p-2 text-green-400 border-green-200 hover:cursor-pointer"
-      >
-        Add
+      <button type="button" onClick={toggleModal} className="btn-success gap-2">
+        <Plus className="h-4 w-4" />
+        Add word
       </button>
 
       {modal && (
         <div className="modal">
-          <div onClick={toggleModal} className="overlay"></div>
-          <div className="modal-content flex flex-col mx-auto justify-center items-center">
-            <h2>
-              <b>New Word</b>
-            </h2>
-            <form className="flex flex-col space-y-2" onSubmit={handleAdd}>
-              <label>Enter term</label>
-              <input
-                type="text"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                required
-              />
-              {term && (
-                <p className="text-sm text-purple-800">
-                  Current chararacter count: {term.length}
-                </p>
-              )}
-              <label>Enter definition</label>
-              <input
-                type="text"
-                value={define}
-                onChange={(e) => setDefine(e.target.value)}
-                required
-              />
-              {define && (
-                <p className="text-sm text-purple-800">
-                  Current chararacter count: {define.length}
-                </p>
-              )}
-              <label>Enter example sentence (optional)</label>
-              <input
-                type="text"
-                className="text-black block w-[400px] p-2 border border-purple-300 rounded-lg text-base"
-                value={sentence}
-                onChange={(e) => setSentence(e.target.value)}
-              />
-              {sentence && (
-                <p className="text-sm text-purple-800">
-                  Current chararacter count: {sentence.length}
-                </p>
-              )}
+          <div onClick={toggleModal} className="overlay" role="presentation" />
+          <div className="modal-content flex flex-col">
+            <h2 className="font-display text-xl font-semibold">New word</h2>
+            <form className="mt-4 flex flex-col space-y-3" onSubmit={handleAdd}>
+              <div>
+                <label>Term</label>
+                <input
+                  type="text"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  required
+                />
+                {term && (
+                  <p className="mt-1 text-xs text-violet-400/70">
+                    {term.length} / 30 characters
+                  </p>
+                )}
+              </div>
+              <div>
+                <label>Definition</label>
+                <input
+                  type="text"
+                  value={define}
+                  onChange={(e) => setDefine(e.target.value)}
+                  required
+                />
+                {define && (
+                  <p className="mt-1 text-xs text-violet-400/70">
+                    {define.length} / 30 characters
+                  </p>
+                )}
+              </div>
+              <div>
+                <label>Example sentence (optional)</label>
+                <input
+                  type="text"
+                  value={sentence}
+                  onChange={(e) => setSentence(e.target.value)}
+                />
+                {sentence && (
+                  <p className="mt-1 text-xs text-violet-400/70">
+                    {sentence.length} / 100 characters
+                  </p>
+                )}
+              </div>
               <div
-                className="flex flex-row items-center hover:cursor-pointer"
+                className="flex flex-row items-center gap-2 hover:cursor-pointer"
                 onClick={() => setDropdownToggle(!dropdownToggle)}
               >
-                <label>Select language</label>
+                <label className="mb-0">Language</label>
                 {dropdownToggle ? <UpArrow /> : <DownArrow />}
               </div>
               {dropdownToggle && (
@@ -138,14 +110,29 @@ const DictModal = () => {
                 />
               )}
               {!dropdownToggle && lang != "None" && lang != "" && (
-                <p className="text-violet-800">{`Language: ${lang}`}</p>
+                <p className="text-sm text-violet-300/80">{`Language: ${lang}`}</p>
               )}
               {message && (
-                <p className="text-red-600 flex text-center">{message}</p>
+                <p className="text-sm text-red-400">{message}</p>
               )}
-              <button type="submit">Add</button>
+              <button type="submit">Add to dictionary</button>
             </form>
-            <CloseModal />
+            <button className="close-modal" type="button" onClick={toggleModal} aria-label="Close">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
           </div>
         </div>
       )}

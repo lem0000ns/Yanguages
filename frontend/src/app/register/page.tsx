@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "../ui/Navbar";
-import { API_URL } from "../config";
+import Link from "next/link";
+import { apiFetch } from "../session";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { UserPlus } from "lucide-react";
 
 const Page = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [pwlen, setPwlen] = useState(0);
-  const [usernameLen, setUsernameLen] = useState(0);
   const [confirmPw, setConfirmPw] = useState("");
   const [message, setMessage] = useState("");
   const [visibleOne, setVisibleOne] = useState(false);
@@ -24,16 +23,13 @@ const Page = () => {
       setMessage("Username must be at most 12 characters");
     else {
       try {
-        const res = await fetch(
-          `${API_URL}/register`,
-          {
-            method: "post",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, password }),
-          }
-        );
+        const res = await apiFetch("/register", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }),
+        });
         if (res.ok) {
           setMessage("Registration successful!");
         } else {
@@ -46,88 +42,102 @@ const Page = () => {
     }
   };
 
-  const handlePwChange = (e) => {
-    setPassword(e.target.value);
-    setPwlen(e.target.value.length);
-  };
-
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
-    setUsernameLen(e.target.value.length);
-  };
-
   return (
-    <>
-      <Navbar username={""} />
-      <div className="flex flex-col justify-center items-center mt-32 ">
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-8">
-          <div className="flex flex-col">
-            <label>Username</label>{" "}
+    <div className="page-container flex min-h-[calc(100dvh-var(--nav-mobile-header)-var(--nav-mobile-tabs)-env(safe-area-inset-bottom))] flex-col items-center justify-center py-12 md:min-h-[calc(100dvh-2rem)]">
+      <div className="card-surface w-full max-w-md animate-slide-up p-8 md:p-10">
+        <div className="mb-8 text-center">
+          <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600/30 text-indigo-200">
+            <UserPlus className="h-6 w-6" />
+          </span>
+          <h1 className="font-display text-2xl font-semibold">Create account</h1>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div>
+            <label className="label-text">Username</label>
             <input
               type="text"
               value={username}
-              className="text-black w-[25vh]"
-              onChange={handleUsernameChange}
+              className="input-field"
+              onChange={(e) => setUsername(e.target.value)}
               required
+              autoComplete="username"
             />
-            <p className="text-sm text-blue-100 mt-1">
-              Must be at most 12 characters
-            </p>
-            <p className="text-sm text-blue-100">
-              Current length: {usernameLen}
+            <p className="mt-1.5 text-xs text-violet-400/60">
+              At most 12 characters · current: {username.length}
             </p>
           </div>
-          <div className="flex flex-col">
-            <label>Password</label>{" "}
-            <div className="flex items-center justify-between">
+          <div>
+            <label className="label-text">Password</label>
+            <div className="relative">
               <input
                 type={visibleOne ? "text" : "password"}
-                className="text-black w-[25vh]"
+                className="input-field pr-11"
                 value={password}
-                onChange={handlePwChange}
+                onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="new-password"
               />
-              <p
-                className="text-x1 cursor-pointer"
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-200"
                 onClick={() => setVisibleOne(!visibleOne)}
+                aria-label="Toggle password visibility"
               >
                 {visibleOne ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </p>
+              </button>
             </div>
-            <p className="text-sm text-blue-100 mt-1">
-              Must be at least 8 characters
+            <p className="mt-1.5 text-xs text-violet-400/60">
+              At least 8 characters · current: {password.length}
             </p>
-            <p className="text-sm text-blue-100">Current length: {pwlen}</p>
           </div>
-          <div className="flex flex-col">
-            <label>Confirm Password</label>{" "}
-            <div className="flex flex-row space-x-2 relative w-full">
+          <div>
+            <label className="label-text">Confirm password</label>
+            <div className="relative">
               <input
                 type={visibleTwo ? "text" : "password"}
-                className="text-black w-[25vh]"
+                className="input-field pr-11"
                 value={confirmPw}
                 onChange={(e) => setConfirmPw(e.target.value)}
                 required
+                autoComplete="new-password"
               />
-              <p
-                className="text-x1 cursor-pointer"
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-200"
                 onClick={() => setVisibleTwo(!visibleTwo)}
+                aria-label="Toggle confirm password visibility"
               >
                 {visibleTwo ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </p>
+              </button>
             </div>
           </div>
-          <button className="mt-2" type="submit">
+          <button className="btn-primary w-full" type="submit">
             Register
           </button>
         </form>
-        {message && message[0] == "R" ? (
-          <p className="mt-2 text-green-200">{message}</p>
-        ) : (
-          <p className="mt-2 text-red-200">{message}</p>
+
+        {message && (
+          <p
+            className={`mt-4 text-center text-sm ${
+              message[0] == "R" ? "text-emerald-300" : "text-red-300"
+            }`}
+          >
+            {message}
+          </p>
         )}
+
+        <p className="mt-8 text-center text-sm text-violet-300/70">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="font-medium text-violet-300 underline-offset-4 hover:text-white hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
       </div>
-    </>
+    </div>
   );
 };
 

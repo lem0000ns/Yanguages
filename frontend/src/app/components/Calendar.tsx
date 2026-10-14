@@ -14,15 +14,18 @@ const Calendar = ({ day, setDate }) => {
 
   useEffect(() => {
     setSelectedDate(day);
-  }, []);
+  }, [day]);
 
   return (
-    <div>
+    <div className="relative z-30">
+      <p className="mb-2 text-sm text-violet-400/70">Date</p>
       <DatePicker
         selected={selectedDate}
         onChange={handleDateChange}
-        className="text-center text-purple-100 bg-violet-950/75 p-1 rounded rounded-2xl"
+        className="input-field w-full max-w-[11rem] text-center text-purple-100"
         maxDate={new Date()}
+        popperClassName="datepicker-popper"
+        popperPlacement="bottom-start"
       />
     </div>
   );

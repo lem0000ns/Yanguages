@@ -1,31 +1,23 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Navbar from "../ui/Navbar";
 import DictItem from "../components/DictItem";
 import DictModal from "../components/AddDictModal";
-import { API_URL } from "../config";
-import { Roboto } from "next/font/google";
-
-const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
+import { Library } from "lucide-react";
 
 const Dict = () => {
   const [dictWords, setDictWords] = useState([]);
-  const [username, setUsername] = useState("");
+  const { username } = useSession();
   const [remove, setRemove] = useState(0);
   const [deleteIds, setDeleteIds] = useState([]);
   const [selectedLang, setSelectedLang] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
-
-  useEffect(() => {
     (async () => {
       if (selectedLang == "" && username && username != "") {
-        const res = await fetch(
-          `${API_URL}/dictionary/${username}`
-        );
+        const res = await apiFetch("/dictionary");
         const data = await res.json();
         setDictWords(data[0]);
         setLoading(false);
@@ -36,8 +28,8 @@ const Dict = () => {
   const handleLangFilter = async () => {
     if (selectedLang != "") {
       if (username && username != "") {
-        const res = await fetch(
-          `${API_URL}/dictionary/${selectedLang}/${username}`
+        const res = await apiFetch(
+          `/dictionary/${encodeURIComponent(selectedLang)}`
         );
         const data = await res.json();
         setDictWords(data[0]);
@@ -51,16 +43,13 @@ const Dict = () => {
         if (deleteIds.length == 0) {
           setRemove(0);
         } else {
-          const res = await fetch(
-            `${API_URL}/dictionary`,
-            {
-              method: "delete",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ deleteIds }),
-            }
-          );
+          const res = await apiFetch("/dictionary", {
+            method: "delete",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ deleteIds }),
+          });
           const data = await res.json();
           if (res.ok) {
             console.log(data.message);
@@ -97,74 +86,81 @@ const Dict = () => {
   };
 
   return (
-    <div>
-      <Navbar username={username} />
+    <div className="page-container">
+      <header className="mb-8 animate-slide-up">
+        <p className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-violet-400/80">
+          <Library className="h-3.5 w-3.5" />
+          Personal library
+        </p>
+        <h1 className="page-title">My dictionary</h1>
+        {username ? (
+          <p className="page-subtitle">
+            {dictWords && dictWords.length > 0
+              ? `${dictWords.length} saved ${dictWords.length === 1 ? "word" : "words"}`
+              : loading
+              ? "Loading your collection…"
+              : "Start adding words from the game or manually."}
+          </p>
+        ) : (
+          <p className="page-subtitle">Sign in to build and manage your word list.</p>
+        )}
+      </header>
+
       {username ? (
-        <div
-          className={`flex flex-col items-center justify-center mx-auto mt-8 ${roboto.className}`}
-        >
-          <div className="mb-4 text-xl text-center">
-            <p>
-              <b>My personal dictionary: </b>
-              {dictWords && dictWords.length > 0
-                ? `${dictWords.length} items`
-                : username && loading
-                ? "Loading..."
-                : "0 items"}
-            </p>
-            <div className="sm:space-x-8 space-x-2 flex justify-center mx-auto mt-3">
-              <DictModal />
-              <p
-                className={`sm:border border-sm rounded-md p-2 ${
-                  remove <= 1 && deleteIds.length == 0
-                    ? "text-red-400 border-red-200"
-                    : "text-red-600 border-red-400"
-                } hover:cursor-pointer`}
-                onClick={handleRemove}
-              >
-                Remove
-              </p>
+        <>
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+            <DictModal />
+            <button
+              type="button"
+              className={
+                remove <= 1 && deleteIds.length == 0 ? "btn-danger" : "btn-danger ring-2 ring-red-400/40"
+              }
+              onClick={handleRemove}
+            >
+              {remove > 0 ? `Confirm remove (${deleteIds.length})` : "Remove words"}
+            </button>
+            <div className="flex flex-1 gap-2 sm:max-w-xs">
               <input
-                className="border border-sm rounded-md bg-black text-blue-400 border-blue-200 text-center"
+                className="input-field"
                 value={selectedLang}
                 onChange={(e) => setSelectedLang(e.target.value)}
-                placeholder="Specify lang"
+                placeholder="Filter by language"
                 onKeyDown={(e) => {
                   if (e.key == "Enter") {
                     handleLangFilter();
                   }
                 }}
               />
+              <button type="button" className="btn-secondary shrink-0" onClick={handleLangFilter}>
+                Go
+              </button>
             </div>
           </div>
-          <div className="w-full grid sm:grid-cols-4 grid-cols-3 gap-y-16">
+
+          {remove > 0 && (
+            <p className="mb-6 text-center text-sm text-violet-300/70">
+              Tap cards to select · Press Esc to cancel
+            </p>
+          )}
+
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {dictWords &&
               dictWords.map((word, index) => (
-                <div
-                  className="w-4/5 flex flex-col justify-center items-center mx-auto mt-12 relative"
-                  key={index}
-                >
+                <li key={index} className="min-h-[8rem]">
                   <DictItem
                     deleteIds={deleteIds}
                     setDeleteIds={setDeleteIds}
                     word={word}
                     remove={remove}
                   />
-                </div>
+                </li>
               ))}
-          </div>
-          {remove > 0 && (
-            <div className="relative w-full flex justify-center mx-auto mt-32 text-purple-200">
-              <p className="absolute">Press esc to exit remove mode</p>
-            </div>
-          )}
-        </div>
+          </ul>
+        </>
       ) : (
-        <p
-          className={`flex text-xl text-sky-100 justify-center mx-auto mt-32 ${roboto.className}`}
-        >
-          Log in to manage personal dictionary!
-        </p>
+        <div className="card-surface mx-auto max-w-md px-8 py-12 text-center text-violet-300/80">
+          Log in to manage your personal dictionary.
+        </div>
       )}
     </div>
   );

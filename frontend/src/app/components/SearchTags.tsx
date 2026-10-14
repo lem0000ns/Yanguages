@@ -1,25 +1,6 @@
 "use client";
 import React, { useState } from "react";
-
-const MagnifyingGlass = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-search"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-};
+import { Search } from "lucide-react";
 
 interface Props {
   tags: string[];
@@ -29,7 +10,7 @@ interface Props {
   username: string;
 }
 
-const Tags = ({
+const SearchTags = ({
   tags,
   addTags,
   removeTags,
@@ -63,43 +44,51 @@ const Tags = ({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center md:w-1/3 w-1/2 relative">
-      <ul className="m-0 flex flex-row gap-x-2 w-full rounded-3xl bg-indigo-950 sm:absolute overflow-x-auto flex-nowrap mb-2 bottom-full">
-        {tags.map((value, index) => (
-          <li
-            className="list-none px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer flex-shrink-0"
-            onClick={() => {
-              handleRemove(index);
-            }}
-            key={index}
-          >
-            <span>{value}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="flex flex-row">
+    <div className="w-full sm:max-w-sm">
+      <p className="mb-2 text-sm text-violet-400/70">Tags</p>
+      {tags.length > 0 && (
+        <ul className="mb-2 flex flex-wrap gap-2">
+          {tags.map((value, index) => (
+            <li
+              className="tag-chip flex-shrink-0"
+              onClick={() => handleRemove(index)}
+              key={index}
+            >
+              {value}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex gap-2">
         <input
-          className="flex w-full rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
-          placeholder="search by tag?"
+          className="input-field flex-1"
+          placeholder="Tag name"
           value={curTag}
           onChange={(e) => setCurTag(e.target.value)}
           onKeyDown={handleEnter}
-          disabled={username ? false : true}
+          disabled={!username}
         />
-        <div className="ml-2 hover:cursor-pointer" onClick={handleTagSearch}>
-          <MagnifyingGlass />
-        </div>
+        <button
+          type="button"
+          className="btn-secondary shrink-0 px-3"
+          onClick={handleTagSearch}
+          disabled={!username}
+          aria-label="Search"
+        >
+          <Search className="h-5 w-5" />
+        </button>
       </div>
       {message && (
-        <div
-          className="mt-4 flex sm:absolute items-center justify-center mx-auto text-red-200 top-full hover:cursor-pointer"
+        <button
+          type="button"
+          className="mt-2 text-left text-sm text-red-300/90"
           onClick={() => setMessage("")}
         >
           {message}
-        </div>
+        </button>
       )}
     </div>
   );
 };
 
-export default Tags;
+export default SearchTags;

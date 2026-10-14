@@ -2,47 +2,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Navbar from "../ui/Navbar";
 import Entry from "./Entry";
-import { API_URL } from "../config";
-import { Roboto } from "next/font/google";
-
-const roboto = Roboto({ subsets: ["latin"], weight: ["400"] });
-
-const BackArrow = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="48"
-      height="48"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-arrow-big-left-dash"
-    >
-      <path d="M19 15V9" />
-      <path d="M15 15h-3v4l-7-7 7-7v4h3v6z" />
-    </svg>
-  );
-};
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
+import { ArrowLeft } from "lucide-react";
 
 const Diary = () => {
-  const [username, setUsername] = useState("");
+  const { username } = useSession();
   const [searchTags, setSearchTags] = useState<string[]>([]);
-  const [searchEntries, setSearchEntries] = useState([]); // stores each diary entry as json object
+  const [searchEntries, setSearchEntries] = useState([]);
   const [curDay, setCurDay] = useState<Date>(new Date());
-
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
-
-  useEffect(() => {
-    console.log(searchEntries);
-    console.log(searchEntries.length);
-  }, [searchEntries]);
 
   const handleView = (date, title, entry) => {
     localStorage.setItem("entry", entry);
@@ -54,59 +23,48 @@ const Diary = () => {
 
   const SearchEntriesDisplay = () => {
     return (
-      <div className="mt-16 sm:w-2/3 w-5/6 mx-auto">
-        <div
-          className="mb-8 flex flex-row hover:cursor-pointer items-center text-3xl"
+      <div className="page-container animate-fade-in">
+        <button
+          type="button"
+          className="btn-ghost mb-8 gap-2 pl-0 text-lg"
           onClick={() => setSearchEntries([])}
         >
-          <BackArrow />
-          Go back?
-        </div>
-        {searchEntries.map(function (data) {
-          return (
-            <div
-              className="flex flex-row border p-2 border-white space-x-4 hover:bg-violet-950"
-              key={data.id}
-            >
-              <p className="w-[12.5%] overflow-x-auto whitespace-nowrap">
-                {data.date}
-              </p>
-              <p className="w-[13%] overflow-x-auto whitespace-nowrap">
-                {data.title}
-              </p>
-              <p className="w-[64.5%] overflow-x-auto whitespace-nowrap">
-                {data.entry}
-              </p>
-              <p
-                className="w-[10%] overflow-x-auto whitespace-nowrap hover:cursor-pointer"
-                onClick={() => handleView(data.date, data.title, data.entry)}
+          <ArrowLeft className="h-5 w-5" />
+          Back to editor
+        </button>
+        <h2 className="page-title mb-6">Search results</h2>
+        <ul className="flex flex-col gap-3">
+          {searchEntries.map(function (data) {
+            return (
+              <li
+                className="card-surface-interactive grid gap-3 p-4 sm:grid-cols-[minmax(0,7rem)_minmax(0,10rem)_1fr_auto] sm:items-center sm:gap-4"
+                key={data.id}
               >
-                View?
-              </p>
-            </div>
-          );
-        })}
+                <p className="text-sm text-violet-400/80">{data.date}</p>
+                <p className="truncate font-medium">{data.title}</p>
+                <p className="truncate text-sm text-violet-200/70">{data.entry}</p>
+                <button
+                  type="button"
+                  className="btn-secondary shrink-0 text-xs sm:text-sm"
+                  onClick={() => handleView(data.date, data.title, data.entry)}
+                >
+                  Open
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     );
   };
 
   const handleTagSearch = async () => {
-    console.log("magnifying glass clicked!");
     if (searchTags.length > 0) {
       try {
         const queryParams = new URLSearchParams({
-          username: username,
           searchTags: searchTags.join(","),
         });
-        const res = await fetch(
-          `${API_URL}/tags/?${queryParams}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await apiFetch(`/tags/?${queryParams}`);
         const data = await res.json();
         if (res.ok) {
           setSearchEntries(data[0] || []);
@@ -119,18 +77,18 @@ const Diary = () => {
 
   return (
     <div>
-      <Navbar username={username} />
-      <div className={roboto.className}>
-        {searchEntries.length == 0 && (
-          <Entry
-            searchTags={searchTags}
-            setSearchTags={setSearchTags}
-            handleTagSearch={handleTagSearch}
-            day={curDay}
-          />
-        )}
-        {searchEntries.length > 0 && <SearchEntriesDisplay />}
-      </div>
+      {searchEntries.length == 0 && (
+        <Entry
+          searchTags={searchTags}
+          setSearchTags={setSearchTags}
+          handleTagSearch={handleTagSearch}
+          day={curDay}
+        />
+      )}
+      {searchEntries.length > 0 && <SearchEntriesDisplay />}
+      {!username && searchEntries.length === 0 && (
+        <p className="pb-24 text-center text-violet-300/60 md:pb-8" />
+      )}
     </div>
   );
 };

@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MdOutlineEdit } from "react-icons/md";
 import Dropdown from "../ui/Dropdown";
 import UpArrow from "../ui/UpArrow";
 import DownArrow from "../ui/DownArrow";
-import { API_URL } from "../config";
+import { apiFetch } from "../session";
 
 const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
-  const [username, setUsername] = useState("");
   const [modal, setModal] = useState(false);
   const [id, setId] = useState(0);
   const [term, setTerm] = useState("");
@@ -16,16 +15,12 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
   const [selected, setSelected] = useState(false);
   const [dropdownToggle, setDropdownToggle] = useState(false);
 
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
-
   const handleEdit = async (e) => {
     e.preventDefault();
-    await fetch(`${API_URL}/dictionary`, {
+    await apiFetch("/dictionary", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, username, term, define, sentence, lang }),
+      body: JSON.stringify({ id, term, define, sentence, lang }),
     });
     location.reload();
   };
@@ -34,35 +29,26 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
     setModal(!modal);
   };
 
-  const EditModal = ({ id, term, define, sentence, lang }) => {
-    const toggleModal = () => {
-      setModal(!modal);
-      setTerm(term);
-      setDefine(define);
-      setSentence(sentence);
-      setLang(lang);
-      setId(id);
-    };
-
-    return (
-      <>
-        <button className="text-sky-300 btn-modal" onClick={toggleModal}>
-          <MdOutlineEdit className="absolute right-[-1vh] top-[-1vh]" />
-        </button>
-      </>
-    );
+  const openEdit = () => {
+    setModal(true);
+    setTerm(word.term);
+    setDefine(word.define);
+    setSentence(word.sentence);
+    setLang(word.lang);
+    setId(word.id);
   };
 
+  const selectedRemove =
+    selected && remove > 0
+      ? "border-red-500/70 ring-2 ring-red-500/30"
+      : remove > 0
+      ? "border-red-400/40 hover:border-red-400/70 cursor-pointer"
+      : "border-border-subtle";
+
   return (
-    <div className="absolute w-full">
-      <div
-        className={`flex flex-col text-center mx-auto rounded-md border p-2 border border-sm rounded-md p-2 ${
-          selected && remove > 0
-            ? "border-red-700 hover:cursor-grab"
-            : remove > 0
-            ? "border-red-300 hover:cursor-grab"
-            : "border-white-100"
-        }`}
+    <>
+      <article
+        className={`card-surface relative flex h-full flex-col p-4 transition-all duration-200 ${selectedRemove}`}
         onClick={() => {
           if (remove > 0) {
             if (!selected) {
@@ -76,66 +62,75 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
           }
         }}
       >
-        {Object.entries(word).map(([key, value]) =>
-          key == "id" ||
-          key == "lang" ||
-          (key == "sentence" && value == "") ? null : (
-            <div
-              key={key}
-              className={`${
-                key == "define"
-                  ? "text-purple-400 whitespace-nowrap overflow-x-auto"
-                  : key == "sentence"
-                  ? "w-full text-purple-100 italic whitespace-nowrap overflow-x-auto"
-                  : "whitespace-nowrap overflow-x-auto"
-              }`}
-            >
-              {value as React.ReactNode}
-              <EditModal
-                id={word.id}
-                term={word.term}
-                define={word.define}
-                sentence={word.sentence}
-                lang={word.lang}
-              />
-            </div>
-          )
+        {remove === 0 && (
+          <button
+            type="button"
+            className="absolute right-3 top-3 rounded-lg p-1.5 text-sky-400/90 transition-colors hover:bg-violet-950/60 hover:text-sky-300"
+            onClick={(e) => {
+              e.stopPropagation();
+              openEdit();
+            }}
+            aria-label="Edit word"
+          >
+            <MdOutlineEdit className="h-4 w-4" />
+          </button>
         )}
-      </div>
+
+        <p className="pr-8 font-display text-xl font-semibold leading-snug">
+          {word.term}
+        </p>
+        <p className="mt-2 text-sm font-medium text-purple-400">{word.define}</p>
+        {word.sentence ? (
+          <p className="mt-3 flex-1 text-sm italic leading-relaxed text-purple-200/70 line-clamp-3">
+            {word.sentence}
+          </p>
+        ) : (
+          <div className="flex-1" />
+        )}
+        {word.lang && (
+          <span className="mt-3 inline-flex w-fit rounded-md bg-violet-950/60 px-2 py-0.5 text-xs text-violet-300/90">
+            {word.lang}
+          </span>
+        )}
+      </article>
+
       {modal && (
         <div className="modal">
-          <div onClick={toggleModal} className="overlay"></div>
-          <div className="modal-content flex flex-col mx-auto justify-center items-center">
-            <h2>
-              <b>Edit Word</b>
-            </h2>
-            <form className="flex flex-col space-y-2" onSubmit={handleEdit}>
-              <label>Edit term</label>
-              <input
-                type="text"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                required
-              />
-              <label>Edit definition</label>
-              <input
-                type="text"
-                value={define}
-                onChange={(e) => setDefine(e.target.value)}
-                required
-              />
-              <label>Edit example sentence</label>
-              <input
-                type="text"
-                className="text-black block w-[400px] p-2 border border-purple-300 rounded-lg text-base"
-                value={sentence}
-                onChange={(e) => setSentence(e.target.value)}
-              />
+          <div onClick={toggleModal} className="overlay" role="presentation" />
+          <div className="modal-content flex flex-col">
+            <h2 className="font-display text-xl font-semibold">Edit word</h2>
+            <form className="mt-4 flex flex-col space-y-3" onSubmit={handleEdit}>
+              <div>
+                <label>Edit term</label>
+                <input
+                  type="text"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label>Edit definition</label>
+                <input
+                  type="text"
+                  value={define}
+                  onChange={(e) => setDefine(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label>Edit example sentence</label>
+                <input
+                  type="text"
+                  value={sentence}
+                  onChange={(e) => setSentence(e.target.value)}
+                />
+              </div>
               <div
-                className="flex flex-row items-center hover:cursor-pointer"
+                className="flex flex-row items-center gap-2 hover:cursor-pointer"
                 onClick={() => setDropdownToggle(!dropdownToggle)}
               >
-                <label>Select language</label>
+                <label className="mb-0">Language</label>
                 {dropdownToggle ? <UpArrow /> : <DownArrow />}
               </div>
               {dropdownToggle && (
@@ -146,11 +141,11 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
                 />
               )}
               {!dropdownToggle && lang != "None" && lang != "" && (
-                <p className="text-violet-800">{`Language: ${lang}`}</p>
+                <p className="text-sm text-violet-300/80">{`Language: ${lang}`}</p>
               )}
-              <button type="submit">Edit</button>
+              <button type="submit">Save changes</button>
             </form>
-            <button className="close-modal" onClick={toggleModal}>
+            <button className="close-modal" type="button" onClick={toggleModal} aria-label="Close">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -161,7 +156,6 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="lucide lucide-x"
               >
                 <path d="M18 6 6 18" />
                 <path d="m6 6 12 12" />
@@ -170,7 +164,7 @@ const DictItem = ({ deleteIds, setDeleteIds, word, remove }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { API_URL } from "../config";
+import React from "react";
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
 
-const Result = ({
+const GameWords = ({
   options,
   wordInfo,
   streak,
@@ -11,23 +12,20 @@ const Result = ({
   lang,
   diff,
 }) => {
-  const [username, setUsername] = useState(() =>
-    localStorage.getItem("username")
-  );
-
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
+  const { username } = useSession();
 
   return (
-    <div>
-      <b className="flex justify-center mx-auto">{word}</b>
-      <div className="flex flex-row mx-auto space-x-4 justify-center mt-4">
+    <div className="mx-auto w-full max-w-lg">
+      <p className="mb-8 text-center font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
+        {word}
+      </p>
+      <ul className="grid gap-3 sm:grid-cols-2">
         {options.map((item, index) => (
-          <div key={index}>
-            <p
-              onClick={(e: React.MouseEvent<HTMLParagraphElement>) => {
-                const text = (e.target as HTMLParagraphElement).innerText;
+          <li key={index}>
+            <button
+              type="button"
+              onClick={() => {
+                const text = item.english;
                 if (text == wordInfo[0].english) {
                   setAnswered("Correct!");
                   setStreak(streak + 1);
@@ -36,27 +34,24 @@ const Result = ({
                     `The correct answer was ${wordInfo[0].english}.\nYou answered ${streak} in a row correctly`
                   );
                   if (username) {
-                    fetch(
-                      `${API_URL}/highscore`,
-                      {
-                        method: "post",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ lang, diff, streak, username }),
-                      }
-                    );
+                    apiFetch("/highscore", {
+                      method: "post",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ lang, diff, streak }),
+                    });
                   }
                   setStreak(0);
                 }
               }}
-              className="hover:cursor-pointer"
+              className="card-surface-interactive w-full px-4 py-4 text-left text-base font-medium text-violet-100 hover:text-white active:scale-[0.99]"
             >
               {item.english}
-            </p>
-          </div>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
 
-export default Result;
+export default GameWords;

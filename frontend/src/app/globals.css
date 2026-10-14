@@ -3,21 +3,121 @@
 @tailwind utilities;
 
 :root {
-  --background: #000000;
-  --foreground: #fefdfd;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #ededed;
-  }
+  --background: #030303;
+  --foreground: #f5f3ff;
+  --surface: #0a0a0f;
+  --surface-raised: #12121a;
+  --surface-muted: #1a1a24;
+  --accent-violet: #8b5cf6;
+  --accent-indigo: #6366f1;
+  --accent-sky: #7dd3fc;
+  --border-subtle: rgba(139, 92, 246, 0.15);
+  --border-strong: rgba(139, 92, 246, 0.35);
+  --sidebar-width: 15.5rem;
+  --nav-mobile-header: 3.25rem;
+  --nav-mobile-tabs: 4.5rem;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer components {
+  .app-bg {
+    background:
+      radial-gradient(
+        ellipse 80% 50% at 50% -20%,
+        rgba(91, 33, 182, 0.22),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 100% 50%,
+        rgba(99, 102, 241, 0.08),
+        transparent
+      ),
+      var(--background);
+  }
+
+  .app-main {
+    min-width: 0;
+    width: 100%;
+    overflow-x: clip;
+    padding-bottom: calc(
+      var(--nav-mobile-tabs) + env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  @media (min-width: 768px) {
+    .app-main {
+      padding-bottom: 0;
+    }
+  }
+
+  .page-container {
+    @apply box-border w-full max-w-6xl px-4 pb-6 pt-6 md:px-8 md:pb-12 md:pt-10;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .page-title {
+    @apply font-display text-3xl font-semibold tracking-tight text-foreground md:text-4xl;
+  }
+
+  .page-subtitle {
+    @apply mt-2 max-w-xl text-base text-violet-200/70;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-border-subtle shadow-card backdrop-blur-sm;
+    background-color: color-mix(in srgb, var(--surface-raised) 88%, transparent);
+  }
+
+  .card-surface-interactive {
+    @apply card-surface transition-all duration-300 ease-smooth hover:border-border-strong hover:shadow-glow-sm;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ease-smooth focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-violet-600 text-white hover:bg-violet-500 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn border border-border-strong text-violet-100 hover:border-violet-400/50 hover:bg-violet-950/40;
+    background-color: color-mix(in srgb, var(--surface-muted) 85%, transparent);
+  }
+
+  .btn-ghost {
+    @apply btn text-violet-200/90 hover:bg-violet-950/50 hover:text-white;
+  }
+
+  .btn-danger {
+    @apply btn border border-red-500/40 bg-red-950/30 text-red-300 hover:border-red-400/60 hover:bg-red-950/50;
+  }
+
+  .btn-success {
+    @apply btn border border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:border-emerald-400/60;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-border-subtle bg-surface-muted px-4 py-2.5 text-foreground placeholder:text-violet-300/40 transition-colors duration-200 focus:border-violet-500/50 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .label-text {
+    @apply mb-1.5 block text-sm font-medium text-violet-200/80;
+  }
+
+  .tag-chip {
+    @apply inline-flex cursor-pointer items-center rounded-lg bg-sky-200/95 px-3 py-1 text-sm font-medium text-black transition-all duration-200 hover:bg-sky-100 hover:ring-2 hover:ring-red-400/60;
+  }
+
+  .nav-link-active {
+    @apply bg-violet-950/60 text-white shadow-glow-sm;
+  }
 }
 
 .modal,
@@ -31,35 +131,62 @@ body {
 }
 
 .overlay {
-  background: rgba(49, 49, 49, 0.8);
+  background: rgba(3, 3, 8, 0.85);
+  backdrop-filter: blur(6px);
+  animation: modalFadeIn 0.2s ease-out;
 }
 
 .modal-content {
   position: absolute;
-  top: 40%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  line-height: 1.4;
-  background: #f1f1f1;
-  padding: 14px 28px;
-  border-radius: 3px;
-  max-width: 600px;
-  min-width: 300px;
-  color: #000000;
-  z-index: 999;
+  line-height: 1.5;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  padding: 1.75rem 2rem;
+  border-radius: 1.25rem;
+  max-width: 32rem;
+  min-width: min(300px, 92vw);
+  color: var(--foreground);
+  z-index: 1000;
+  box-shadow: 0 0 60px -12px rgba(139, 92, 246, 0.4);
+  animation: modalSlideUp 0.35s ease-out;
+}
+
+.modal-content input:not([type="submit"]) {
+  @apply input-field text-foreground;
+}
+
+.modal-content label {
+  @apply label-text;
+}
+
+.modal-content button[type="submit"] {
+  @apply btn-primary mt-2 w-full;
 }
 
 .close-modal {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 5px 7px;
+  top: 12px;
+  right: 12px;
+  padding: 6px;
+  border-radius: 0.5rem;
+  color: violet-300;
+  transition: background 0.2s, color 0.2s;
+}
+
+.close-modal:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: white;
 }
 
 .logout-dropdown-container {
-  background-color: rgba(0, 0, 0, 0.6);
-  box-shadow: 0px 10px 30px 0px rgba(82, 63, 105, 0.05);
-  border-radius: 25px;
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  border-radius: 0.75rem;
+  overflow: hidden;
 }
 
 .logout-dropdown {
@@ -69,12 +196,121 @@ body {
 }
 
 .logout-dropdown li {
-  padding: 14px;
-  transition: all linear 0.3s;
+  padding: 0.75rem 1.25rem;
+  transition: background 0.2s, color 0.2s;
+  font-size: 0.9375rem;
 }
 
 .logout-dropdown-container:hover {
-  background: rgba(198, 153, 247, 0.8);
+  border-color: var(--border-strong);
+}
+
+.logout-dropdown li:hover {
+  background: rgba(139, 92, 246, 0.2);
   cursor: pointer;
-  color: #000;
+  color: #fff;
+}
+
+.datepicker-popper {
+  z-index: 100 !important;
+}
+
+.react-datepicker-popper {
+  z-index: 100 !important;
+}
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker {
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 1rem !important;
+  font-family: inherit !important;
+}
+
+.react-datepicker__header {
+  background: var(--surface-muted) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day {
+  color: var(--foreground) !important;
+}
+
+.react-datepicker__day:hover {
+  background: rgba(139, 92, 246, 0.25) !important;
+}
+
+.react-datepicker__day--selected {
+  background: rgb(124, 58, 237) !important;
+}
+
+.react-datepicker__day--disabled {
+  opacity: 0.35 !important;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 12px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* App shell — outside @layer so layout always wins */
+.app-shell-layout {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.app-shell-sidebar {
+  display: none;
+  flex-direction: column;
+  box-sizing: border-box;
+  border-right: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.app-shell-main-wrap {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .app-shell-sidebar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 40;
+    height: 100dvh;
+    width: var(--sidebar-width);
+    overflow-y: auto;
+  }
+
+  .app-shell-main-wrap {
+    margin-left: var(--sidebar-width);
+    width: calc(100vw - var(--sidebar-width));
+    max-width: calc(100vw - var(--sidebar-width));
+  }
 }

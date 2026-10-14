@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type NextFunction, type Response } from "express";
 import path from "path";
 import cors from "cors";
 import passport from "passport";
@@ -26,10 +26,37 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(session({ secret: "secret", resave: false, saveUninitialized: false })); // middleware
+const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN ?? "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET ?? lld_pw ?? "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    },
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors());
 app.use(express.json());
 
 passport.use(
@@ -86,8 +113,39 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ message: "Successful login" });
+interface UserRow extends RowDataPacket {
+  id: number;
+  username: string;
+}
+
+function sessionUsername(req: IGetUserAuthInfoRequest) {
+  const rows = req.user as UserRow[] | undefined;
+  return rows?.[0]?.username;
+}
+
+function requireAuth(
+  req: IGetUserAuthInfoRequest,
+  res: Response,
+  next: NextFunction
+) {
+  if (!sessionUsername(req)) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
+  next();
+}
+
+app.post("/login", passport.authenticate("local"), (req: IGetUserAuthInfoRequest, res) => {
+  res.json({ message: "Successful login", username: sessionUsername(req) });
+});
+
+app.get("/me", (req: IGetUserAuthInfoRequest, res) => {
+  const username = sessionUsername(req);
+  if (!username) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
+  res.json({ username });
 });
 
 app.post("/register", async (req, res) => {
@@ -109,8 +167,12 @@ app.post("/register", async (req, res) => {
 app.get("/logout", (req: IGetUserAuthInfoRequest, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
+    req.session.destroy((destroyErr) => {
+      if (destroyErr) return next(destroyErr);
+      res.clearCookie("connect.sid");
+      res.status(200).json({ message: "Successfully logged out" });
+    });
   });
-  res.status(200).json({ message: "Successfully logged out" });
 });
 
 interface Word extends RowDataPacket {
@@ -188,9 +250,12 @@ app.get("/api/options/med", (req, res) => getOptions("med", res));
 app.get("/api/options/hard", (req, res) => getOptions("hard", res));
 app.get("/api/word", (req, res) => getAPIword("", res));
 
-app.get(`/highscore/:username`, async (req, res) => {
+const SCORE_LANGS = new Set(["sp", "kr", "zh"]);
+const SCORE_DIFFS = new Set(["easy", "med", "hard"]);
+
+app.get("/highscore", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const username = req.params.username;
+    const username = sessionUsername(req);
     const [results] = await lld_pool.query<Score[]>(
       "SELECT sp_easy, sp_med, sp_hard, kr_easy, kr_med, kr_hard, zh_easy, zh_med, zh_hard FROM usrs WHERE username = ?",
       [username]
@@ -198,23 +263,34 @@ app.get(`/highscore/:username`, async (req, res) => {
     res.json(results);
   } catch (e) {
     console.error("Error, ", e);
+    res.status(500).json({ message: "Error retrieving high score" });
   }
 });
 
-app.post("/highscore", async (req, res) => {
+app.post("/highscore", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const { lang, diff, streak, username } = req.body;
-    const mode = lang + "_" + diff;
+    const username = sessionUsername(req);
+    const { lang, diff, streak } = req.body;
+    if (!SCORE_LANGS.has(lang) || !SCORE_DIFFS.has(diff)) {
+      res.status(400).json({ message: "Invalid score field" });
+      return;
+    }
+    const streakNum = Number(streak);
+    if (!Number.isFinite(streakNum) || streakNum < 0) {
+      res.status(400).json({ message: "Invalid streak" });
+      return;
+    }
+    const column = `${lang}_${diff}`;
     const result = await lld_pool.query(
-      `SELECT ${mode} FROM usrs WHERE username = ?`,
+      `SELECT \`${column}\` AS score FROM usrs WHERE username = ?`,
       [username]
     );
-    const curScore = result[0][0][`${lang}_${diff}`];
-    if (streak > curScore) {
-      await lld_pool.query(`UPDATE usrs SET ${mode} = ? WHERE username = ?`, [
-        streak,
-        username,
-      ]);
+    const curScore = result[0][0]?.score ?? 0;
+    if (streakNum > curScore) {
+      await lld_pool.query(
+        `UPDATE usrs SET \`${column}\` = ? WHERE username = ?`,
+        [streakNum, username]
+      );
       res.status(200).json({ message: "High score successfully updated" });
     } else {
       res.status(200).json({ message: "No high score update" });
@@ -225,9 +301,10 @@ app.post("/highscore", async (req, res) => {
   }
 });
 
-app.post("/dictionary", async (req, res) => {
+app.post("/dictionary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const { username, term, define, sentence, lang } = req.body;
+    const username = sessionUsername(req);
+    const { term, define, sentence, lang } = req.body;
     await lld_pool.query(
       "INSERT INTO dict (username, term, define, sentence, lang) VALUES (?, ?, ?, ?, ?)",
       [username, term, define, sentence, lang]
@@ -240,9 +317,10 @@ app.post("/dictionary", async (req, res) => {
   }
 });
 
-app.put("/dictionary", async (req, res) => {
+app.put("/dictionary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const { id, username, term, define, sentence, lang } = req.body;
+    const username = sessionUsername(req);
+    const { id, term, define, sentence, lang } = req.body;
     const tempLang = lang == "None" ? "" : lang;
     await lld_pool.query(
       "UPDATE dict SET term = ?, define = ?, sentence = ?, lang = ? WHERE id = ? AND username = ?",
@@ -255,9 +333,9 @@ app.put("/dictionary", async (req, res) => {
   }
 });
 
-app.get("/dictionary/:username", async (req, res) => {
+app.get("/dictionary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const username = req.params.username;
+    const username = sessionUsername(req);
     const results = await lld_pool.query(
       "SELECT id, term, define, sentence, lang FROM dict WHERE username = ?",
       [username]
@@ -269,10 +347,10 @@ app.get("/dictionary/:username", async (req, res) => {
   }
 });
 
-app.get("/dictionary/:lang/:username", async (req, res) => {
+app.get("/dictionary/:lang", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
     const lang = req.params.lang.toLowerCase();
-    const username = req.params.username;
+    const username = sessionUsername(req);
     const results = await lld_pool.query(
       "SELECT id, term, define, sentence, lang FROM dict WHERE username = ? AND lang = ?",
       [username, lang]
@@ -284,17 +362,27 @@ app.get("/dictionary/:lang/:username", async (req, res) => {
   }
 });
 
-app.delete("/dictionary", async (req, res) => {
+app.delete("/dictionary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
+    const username = sessionUsername(req);
     const { deleteIds } = req.body;
-    if (deleteIds.length > 0) {
-      const temp = deleteIds.map((num) => `id=${num}`);
-      const tempS = temp.join(" OR ");
-      await lld_pool.query(`DELETE FROM dict WHERE ${tempS}`);
-      res.status(200).json({ message: "Successfully deleted dictionary item" });
-    } else {
+    if (!Array.isArray(deleteIds) || deleteIds.length === 0) {
       res.status(200).json({ message: "No dictionary items were deleted" });
+      return;
     }
+    const ids = deleteIds
+      .map((num) => Number(num))
+      .filter((num) => Number.isInteger(num) && num > 0);
+    if (ids.length === 0) {
+      res.status(400).json({ message: "Invalid dictionary ids" });
+      return;
+    }
+    const placeholders = ids.map(() => "?").join(", ");
+    await lld_pool.query(
+      `DELETE FROM dict WHERE username = ? AND id IN (${placeholders})`,
+      [username, ...ids]
+    );
+    res.status(200).json({ message: "Successfully deleted dictionary item" });
   } catch (e) {
     console.error("Error deleting dictionary item, ", e);
     res.status(500).json({ message: "Error deleting dictionary item" });
@@ -305,9 +393,10 @@ interface Tag extends RowDataPacket {
   id: number;
 }
 
-app.post("/diary", async (req, res) => {
+app.post("/diary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const { username, title, entry, date, diaryTags } = req.body;
+    const username = sessionUsername(req);
+    const { title, entry, date, diaryTags } = req.body;
     const [rows, fields] = await lld_pool.query(
       "SELECT * FROM diaries WHERE username = ? AND date = ?",
       [username, date]
@@ -338,10 +427,11 @@ app.post("/diary", async (req, res) => {
     );
     if (Array.isArray(temp) && temp.length > 0) {
       const diaryId = temp[0].id;
-      for (var i = 0; i < diaryTags.length; i++) {
+      const tags = Array.isArray(diaryTags) ? diaryTags : [];
+      for (var i = 0; i < tags.length; i++) {
         await lld_pool.query(
           "INSERT INTO tags (diaryId, username, date, tag) VALUES (?, ?, ?, ?)",
-          [diaryId, username, date, diaryTags[i]]
+          [diaryId, username, date, tags[i]]
         );
       }
     }
@@ -352,18 +442,26 @@ app.post("/diary", async (req, res) => {
   }
 });
 
-app.get("/tags/", async (req, res) => {
+app.get("/tags/", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const username = req.query.username;
-    const searchTags = (req.query.searchTags as string).split(",");
-    let temp = "";
-    for (let i = 0; i < searchTags.length; i++) {
-      temp += `tags.tag="${searchTags[i]}" OR `;
+    const username = sessionUsername(req);
+    const rawTags = req.query.searchTags;
+    if (typeof rawTags !== "string" || rawTags.length === 0) {
+      res.status(400).json({ message: "No tags provided" });
+      return;
     }
-    temp = temp.substring(0, temp.length - 4);
+    const searchTags = rawTags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+    if (searchTags.length === 0) {
+      res.status(400).json({ message: "No tags provided" });
+      return;
+    }
+    const placeholders = searchTags.map(() => "?").join(", ");
     const results = await lld_pool.query(
-      `SELECT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username=? AND (${temp})`,
-      [username]
+      `SELECT DISTINCT diaries.id, diaries.date, diaries.title, diaries.entry FROM diaries INNER JOIN tags ON diaries.id = tags.diaryId WHERE tags.username = ? AND tags.tag IN (${placeholders})`,
+      [username, ...searchTags]
     );
     res.status(200).json(results);
   } catch (e) {
@@ -374,9 +472,9 @@ app.get("/tags/", async (req, res) => {
   }
 });
 
-app.get("/diary/:username/:date", async (req, res) => {
+app.get("/diary/:date", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const username = req.params.username;
+    const username = sessionUsername(req);
     const date = req.params.date;
     const [temp] = await lld_pool.execute<Tag[]>(
       "SELECT id, title, entry FROM diaries WHERE username = ? AND date = ?",
@@ -403,9 +501,10 @@ app.get("/diary/:username/:date", async (req, res) => {
   }
 });
 
-app.delete("/diary", async (req, res) => {
+app.delete("/diary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
   try {
-    const { username, date } = req.body;
+    const username = sessionUsername(req);
+    const { date } = req.body;
     await lld_pool.query("DELETE FROM diaries WHERE username=? AND date=?", [
       username,
       date,

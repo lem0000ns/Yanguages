@@ -1,24 +1,145 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { API_URL } from "../config";
+import { ChevronDown } from "lucide-react";
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
 
-const Configs = ({ setDiff, setLang }) => {
-  const [username, setUsername] = useState("");
+const languages = ["Spanish", "Korean", "Chinese"];
+
+const diffOptions = [
+  {
+    id: "easy",
+    label: "Easy",
+    active: "border-emerald-500/50 bg-emerald-950/40 text-emerald-200",
+  },
+  {
+    id: "med",
+    label: "Medium",
+    active: "border-orange-500/50 bg-orange-950/40 text-orange-200",
+  },
+  {
+    id: "hard",
+    label: "Hard",
+    active: "border-red-500/50 bg-red-950/40 text-red-200",
+  },
+];
+
+const langOptions = [
+  { code: "sp", label: "Spanish" },
+  { code: "kr", label: "Korean" },
+  { code: "zh", label: "Chinese" },
+];
+
+export function GameControls({
+  setDiff,
+  setLang,
+  diff,
+  lang,
+  open,
+  onToggle,
+}: {
+  setDiff: (d: string) => void;
+  setLang: (l: string) => void;
+  diff: string;
+  lang: string;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const langLabel =
+    langOptions.find((l) => l.code === lang)?.label ?? lang;
+  const diffLabel =
+    diffOptions.find((d) => d.id === diff)?.label ??
+    (diff === "med" ? "Medium" : diff);
+
+  return (
+    <div className="card-surface overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-violet-950/30 md:px-5"
+        aria-expanded={open}
+      >
+        <span className="text-sm font-medium text-violet-100">Settings</span>
+        <span className="flex items-center gap-2 text-xs text-violet-400/80">
+          {!open && (
+            <>
+              <span>{langLabel}</span>
+              <span aria-hidden>·</span>
+              <span>{diffLabel}</span>
+            </>
+          )}
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 transition-transform duration-300 ease-in-out ${open ? "rotate-180" : ""}`}
+          />
+        </span>
+      </button>
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <div
+            className={`space-y-4 border-t border-border-subtle p-4 transition-opacity duration-300 md:p-5 ${open ? "opacity-100" : "opacity-0"}`}
+          >
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-violet-400/70">
+                Difficulty
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {diffOptions.map(({ id, label, active }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setDiff(id)}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+                      diff === id
+                        ? active
+                        : "border-border-subtle text-violet-300/70 hover:border-border-strong hover:bg-violet-950/30"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-violet-400/70">
+                Language
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {langOptions.map(({ code, label }) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setLang(code)}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+                      lang === code
+                        ? "border-violet-500/50 bg-violet-950/50 text-white shadow-glow-sm"
+                        : "border-border-subtle text-violet-300/70 hover:border-border-strong"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function HighScores() {
+  const { username } = useSession();
   const [scores, setScores] = useState([]);
   const [langScores, setLangScores] = useState([[]]);
-  const languages = ["Spanish", "Korean", "Chinese"];
-
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
 
   useEffect(() => {
     (async () => {
       if (username && username != "") {
-        const res = await fetch(
-          `${API_URL}/highscore/${username}`
-        );
+        const res = await apiFetch("/highscore");
         const data = await res.json();
         setScores(data[0]);
       }
@@ -29,7 +150,6 @@ const Configs = ({ setDiff, setLang }) => {
     const groupScores = [];
     let curScores = [];
     const temp = Object.keys(scores);
-    // separating scores into groups of 3 (for each language)
     for (let i = 0; i < temp.length; i++) {
       const key = temp[i];
       const value = scores[key];
@@ -42,67 +162,62 @@ const Configs = ({ setDiff, setLang }) => {
     setLangScores(groupScores);
   }, [scores]);
 
-  return (
-    <div className="flex flex-col mx-auto text-xl">
-      <div className="flex flex-row space-x-4 mx-auto items-center justify-content">
-        <p
-          className="hover:cursor-pointer text-green-100 hover:text-green-200"
-          onClick={() => setDiff("easy")}
-        >
-          Easy
-        </p>
-        <p
-          className="hover:cursor-pointer text-orange-100 hover:text-orange-200"
-          onClick={() => setDiff("med")}
-        >
-          Medium
-        </p>
-        <p
-          className="hover:cursor-pointer text-red-200 hover:text-red-300"
-          onClick={() => setDiff("hard")}
-        >
-          Hard
-        </p>
-      </div>
-      <div className="flex flex-row space-x-4 mx-auto items-center justify-center mt-4">
-        <p className="hover:cursor-pointer" onClick={() => setLang("sp")}>
-          Spanish
-        </p>
-        <p className="hover:cursor-pointer" onClick={() => setLang("kr")}>
-          Korean
-        </p>
-        <p className="hover:cursor-pointer" onClick={() => setLang("zh")}>
-          Chinese
-        </p>
-      </div>
-      {langScores.length > 0 ? (
-        <div className="flex flex-col mx-auto items-center justify-center mt-16 space-y-4">
-          <b className="text-4xl text-sky-100 mb-4 border-t border-b p-4 flex justify-center">
-            High Scores
-          </b>
+  if (langScores.length > 0 && langScores[0]?.length > 0) {
+    return (
+      <div className="card-surface px-6 py-6">
+        <h2 className="font-display text-xl font-semibold text-sky-100/95">
+          High scores
+        </h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
           {langScores.map((lang, i) => (
             <div key={i}>
-              <b className="flex justify-center mx-auto text-1xl">
+              <p className="mb-2 text-sm font-semibold text-violet-200">
                 {languages[i]}
-              </b>
-              <p className="flex flex-row space-x-4">
-                {lang.map((diff, j) => (
-                  <span key={j}>
-                    {diff.substring(diff.length - 4) == "null"
-                      ? diff.substring(0, diff.length - 4) + "0"
-                      : diff}
-                  </span>
-                ))}
               </p>
+              <ul className="space-y-1 text-sm text-violet-300/80">
+                {lang.map((entry, j) => (
+                  <li key={j}>
+                    {entry.substring(entry.length - 4) == "null"
+                      ? entry.substring(0, entry.length - 4) + "0"
+                      : entry}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
-      ) : (
-        <div className="text-sky-100 mt-12">
-          Log in to keep track of high scores!
-        </div>
-      )}
-    </div>
+      </div>
+    );
+  }
+
+  return (
+    <p className="text-center text-sm text-violet-400/60">
+      Sign in to track high scores across languages.
+    </p>
+  );
+}
+
+/** @deprecated Use GameControls + HighScores on the game page */
+const Configs = ({ setDiff, setLang }) => {
+  const [diff, setDiffLocal] = useState("easy");
+  const [lang, setLangLocal] = useState("sp");
+  const [open, setOpen] = useState(true);
+
+  return (
+    <GameControls
+      setDiff={(d) => {
+        setDiffLocal(d);
+        setDiff(d);
+      }}
+      setLang={(l) => {
+        setLangLocal(l);
+        setLang(l);
+      }}
+      diff={diff}
+      lang={lang}
+      open={open}
+      onToggle={() => setOpen(!open)}
+    />
   );
 };
 

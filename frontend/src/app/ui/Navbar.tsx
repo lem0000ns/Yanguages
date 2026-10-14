@@ -5,7 +5,7 @@ import { X, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserIcon from "../ui/UserIcon";
-import { API_URL } from "../config";
+import { apiFetch } from "../session";
 import { Lato } from "next/font/google";
 
 const lato = Lato({ subsets: ["latin"], weight: ["400"] });
@@ -18,11 +18,8 @@ const LogoutDropdown = () => {
     e.preventDefault();
     try {
       // logging out
-      const res = await fetch(
-        `${API_URL}/logout`
-      );
+      const res = await apiFetch("/logout");
       if (res.ok) {
-        localStorage.removeItem("username");
         localStorage.removeItem("entry");
         localStorage.removeItem("title");
         setLoggedin(false);

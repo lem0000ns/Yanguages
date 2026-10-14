@@ -39,31 +39,32 @@ const Tags = ({ tags, addTags, removeTags, entry, title }: Props) => {
   };
 
   return (
-    <div className="mt-2 space-y-2">
-      <ul className="flex flex-wrap justify-center space-x-4 mx-auto">
+    <div className="space-y-3">
+      <p className="text-xs font-medium uppercase tracking-wider text-violet-400/70">
+        Tags
+      </p>
+      <ul className="flex flex-wrap gap-2">
         {tags.map((value, index) => (
           <li
-            className="flex flex-row list-none p-1 px-3 m-1 rounded-2xl bg-sky-200/95 text-black hover:border-red-500 hover:ring-2 hover:ring-red-500 hover:shadow-lg hover:shadow-red-500/50 hover:cursor-pointer"
+            className="tag-chip"
             onClick={() => {
               handleRemove(index);
             }}
             key={index}
           >
-            <span>{value}</span>
+            {value}
           </li>
         ))}
       </ul>
       <input
-        className="flex justify-center rounded-3xl text-white bg-indigo-950 mx-auto h-8 p-3"
-        placeholder="add tags?"
+        className="input-field max-w-md"
+        placeholder="Add a tag and press Enter"
         value={curTag}
         onChange={(e) => setCurTag(e.target.value)}
         onKeyDown={handleEnter}
       />
       {message && (
-        <div className="flex justify-center mx-auto text-red-200">
-          {message}
-        </div>
+        <div className="text-sm text-red-300/90">{message}</div>
       )}
     </div>
   );

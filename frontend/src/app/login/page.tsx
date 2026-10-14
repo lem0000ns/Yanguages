@@ -2,8 +2,11 @@
 
 import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import Navbar from "../ui/Navbar";
-import { API_URL } from "../config";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
+import { LogIn } from "lucide-react";
 
 const Page = () => {
   const [username, setUsername] = useState("");
@@ -11,85 +14,113 @@ const Page = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [visible, setVisible] = useState(false);
+  const router = useRouter();
+  const { refreshSession } = useSession();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      // logging in
-      const res = await fetch(
-        `${API_URL}/login`,
-        {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        }
-      );
+      const res = await apiFetch("/login", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) {
+        setMessage("Incorrect username or password");
+        setLogin(false);
+        return;
+      }
       const data = await res.json();
       setMessage(data.message);
-      localStorage.setItem("username", username);
       setLogin(true);
+      await refreshSession();
+      router.push("/dict");
     } catch (e) {
       console.log(e);
       setMessage("Incorrect username or password");
-      localStorage.removeItem("username");
       setLogin(false);
     }
   };
 
   return (
-    <>
-      <Navbar username={login ? username : ""} />
-      <div className="flex flex-col justify-center items-center mx-auto mt-32">
-        <form onSubmit={handleSubmit} className="flex flex-col items-cente">
-          <div className="flex flex-col">
-            <label>Username</label>{" "}
+    <div className="page-container flex min-h-[calc(100dvh-var(--nav-mobile-header)-var(--nav-mobile-tabs)-env(safe-area-inset-bottom))] flex-col items-center justify-center md:min-h-[calc(100dvh-2rem)]">
+      <div className="card-surface w-full max-w-md animate-slide-up p-8 md:p-10">
+        <div className="mb-8 text-center">
+          <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-600/30 text-violet-200">
+            <LogIn className="h-6 w-6" />
+          </span>
+          <h1 className="font-display text-2xl font-semibold">Welcome back</h1>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div>
+            <label className="label-text" htmlFor="username">
+              Username
+            </label>
             <input
+              id="username"
               type="text"
               value={username}
-              className="text-black w-[25vh]"
+              className="input-field"
               onChange={(e) => setUsername(e.target.value)}
               required
+              autoComplete="username"
             />
           </div>
-          <div className="flex flex-col">
-            <label>Password</label>{" "}
-            <div className="flex flex-row space-x-2 relative w-full">
+          <div>
+            <label className="label-text" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
               <input
+                id="password"
                 type={visible ? "text" : "password"}
-                className="text-black w-[25vh]"
+                className="input-field pr-11"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
               />
-              <p
-                className="text-x1 cursor-pointer"
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-400 hover:text-violet-200"
                 onClick={() => setVisible(!visible)}
+                aria-label={visible ? "Hide password" : "Show password"}
               >
                 {visible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </p>
+              </button>
             </div>
           </div>
-          <button className="mt-2" type="submit">
-            Login
+          <button className="btn-primary mt-2 w-full" type="submit">
+            Sign in
           </button>
         </form>
-        {message && message[0] == "S" ? (
-          <p className="mt-2 text-green-200">{message}</p>
-        ) : (
-          <p className="mt-2 text-red-200">{message}</p>
+
+        {message && (
+          <p
+            className={`mt-4 text-center text-sm ${
+              message[0] == "S" ? "text-emerald-300" : "text-red-300"
+            }`}
+          >
+            {message}
+          </p>
         )}
+
         {!login && (
-          <div className="mt-16 flex flex-col items-center space-y-4">
-            <p>No account?</p>
-            <a className="border rounded-md p-2" href="/register">
-              Register
-            </a>
-          </div>
+          <p className="mt-8 text-center text-sm text-violet-300/70">
+            No account?{" "}
+            <Link
+              href="/register"
+              className="font-medium text-violet-300 underline-offset-4 hover:text-white hover:underline"
+            >
+              Create one
+            </Link>
+          </p>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

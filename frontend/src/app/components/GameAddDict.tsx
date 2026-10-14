@@ -1,68 +1,66 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { API_URL } from "../config";
+import React, { useState } from "react";
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
 
 const AddDict = ({ term, define, lang }) => {
-  const [username, setUsername] = useState("");
+  const { username } = useSession();
   const [sentence, setSentence] = useState("");
   const [message, setMessage] = useState("");
   const [add, setAdd] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
-
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!username) {
+      setError("Log in to add words");
+      return;
+    }
     if (sentence.length > 100) {
       setError("Sentence must be at most 100 characters");
     } else {
-      e.preventDefault();
-      console.log("Term entered: ", term);
-      console.log("Definition: ", define);
-      console.log("Example sentence", sentence);
-      console.log("Language: ", lang);
-      const res = await fetch(
-        `${API_URL}/dictionary`,
-        {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, term, define, sentence, lang }),
-        }
-      );
+      const res = await apiFetch("/dictionary", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ term, define, sentence, lang }),
+      });
       const data = await res.json();
       setMessage(data.message);
     }
   };
 
   return (
-    <div>
+    <div className="flex w-full flex-col items-center">
       {!add && message.length == 0 && (
-        <button className="mt-16" onClick={() => setAdd(true)}>
-          Add to personal dictionary?
+        <button
+          type="button"
+          className="btn-ghost text-sm"
+          onClick={() => setAdd(true)}
+        >
+          Save to personal dictionary
         </button>
       )}
       {!message && add && (
-        <div className="flex flex-col justify-center items-center mx-auto space-y-4 mt-8">
-          <label htmlFor="addItem">Example sentence? (optional)</label>
+        <div className="card-surface mt-4 w-full max-w-md space-y-4 p-5">
+          <label htmlFor="addItem" className="label-text">
+            Example sentence (optional)
+          </label>
           <input
             id="addItem"
             type="text"
-            className="text-white block w-[400px] p-2 border border-purple-300 rounded-lg text-base bg-black"
+            className="input-field"
             value={sentence}
             onChange={(e) => setSentence(e.target.value)}
           />
-          {error && <p className="text-red-400 flex text-center">{error}</p>}
-          <button className="border rounded-md p-2" onClick={handleSubmit}>
-            <b>Add</b>
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          <button type="button" className="btn-primary w-full" onClick={handleSubmit}>
+            Add word
           </button>
         </div>
       )}
       {message && (
-        <p className="text-green-100 flex items-center justify-center mx-auto mt-8">
-          {message}
-        </p>
+        <p className="mt-4 text-center text-sm text-emerald-300/90">{message}</p>
       )}
     </div>
   );

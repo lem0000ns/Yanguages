@@ -2,23 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "../ui/Navbar";
-import { API_URL } from "../config";
+import { apiFetch } from "../session";
+import { useSession } from "../useSession";
+import { LogOut } from "lucide-react";
 
 const Page = () => {
-  const [username, setUsername] = useState("");
+  const { username } = useSession();
   const [message, setMessage] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // logging out
-      const res = await fetch(
-        `${API_URL}/logout`
-      );
+      const res = await apiFetch("/logout");
       if (res.ok) {
-        localStorage.removeItem("username");
         localStorage.removeItem("entry");
         localStorage.removeItem("title");
         setMessage("Logged out successfully!");
@@ -35,30 +32,31 @@ const Page = () => {
     if (message[0] == "L") router.push("/");
   }, [message, router]);
 
-  useEffect(() => {
-    setUsername(localStorage.getItem("username"));
-  }, []);
-
   return (
-    <>
-      <Navbar username={username} />
-      <div className="flex flex-col justify-center items-center mx-auto mt-32">
-        <h1 className="text-7xl mb-8">Hello, {username}</h1>
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center mx-auto"
-        >
-          <button className="mt-2 border rounded-md p-2" type="submit">
-            Logout
+    <div className="page-container flex min-h-[50vh] flex-col items-center justify-center">
+      <div className="card-surface w-full max-w-md p-8 text-center">
+        <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-950/80 text-violet-200">
+          <LogOut className="h-6 w-6" />
+        </span>
+        <h1 className="font-display text-2xl font-semibold">
+          Hello, {username || "friend"}
+        </h1>
+        <form onSubmit={handleSubmit} className="mt-8">
+          <button className="btn-secondary w-full" type="submit">
+            Log out
           </button>
         </form>
-        {message && message[0] == "L" ? (
-          <p className="mt-2 text-green-200">{message}</p>
-        ) : (
-          <p className="mt-2 text-red-200">{message}</p>
+        {message && (
+          <p
+            className={`mt-4 text-sm ${
+              message[0] == "L" ? "text-emerald-300" : "text-red-300"
+            }`}
+          >
+            {message}
+          </p>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
