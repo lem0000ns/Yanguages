@@ -87,7 +87,13 @@ export default function AdminWordsPage() {
       const res = await apiFetch(`/admin/words?${params.toString()}`);
       const body = await res.json();
       if (!res.ok) {
-        setError(body.message ?? "Could not load words");
+        const detail =
+          typeof body.detail === "string" ? body.detail : "";
+        setError(
+          [body.message ?? "Could not load words", detail]
+            .filter(Boolean)
+            .join(" — ")
+        );
         setData(null);
         return;
       }

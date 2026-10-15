@@ -381,12 +381,13 @@ app.get("/admin/words", requireWordEditor, async (req, res) => {
     );
     const total = Number(countRows[0]?.total ?? 0);
 
+    // LIMIT/OFFSET cannot use prepared placeholders on many MySQL setups.
     const [items] = await lld_pool.query<Word[]>(
-      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, def
+      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, \`def\`
        FROM words ${where}
        ORDER BY id ASC
-       LIMIT ? OFFSET ?`,
-      [...params, limit, offset]
+       LIMIT ${limit} OFFSET ${offset}`,
+      params
     );
 
     res.json({
@@ -398,7 +399,9 @@ app.get("/admin/words", requireWordEditor, async (req, res) => {
     });
   } catch (error) {
     console.error("Error listing words for admin:", error);
-    res.status(500).json({ message: "Error listing words" });
+    const detail =
+      error instanceof Error ? error.message : String(error);
+    res.status(500).json({ message: "Error listing words", detail });
   }
 });
 
@@ -465,7 +468,7 @@ app.put("/admin/words/:id", requireWordEditor, async (req, res) => {
     }
 
     const [rows] = await lld_pool.query<Word[]>(
-      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, def FROM words WHERE id = ?`,
+      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, \`def\` FROM words WHERE id = ?`,
       [id]
     );
     res.json({ item: rows[0] });
