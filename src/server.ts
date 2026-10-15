@@ -138,7 +138,8 @@ interface UserRow extends RowDataPacket {
 
 function sessionUsername(req: IGetUserAuthInfoRequest) {
   const rows = req.user as UserRow[] | undefined;
-  return rows?.[0]?.username;
+  const name = rows?.[0]?.username;
+  return typeof name === "string" ? name.trim() : undefined;
 }
 
 function requireAuth(
@@ -155,19 +156,35 @@ function requireAuth(
 
 const WORD_DIFFS = new Set(["easy", "med", "hard"]);
 
+function normalizeUsername(value: string) {
+  return value.trim().toLowerCase();
+}
+
+/** Strip wrapping quotes Railway/UI sometimes add to env values. */
+function parseEditorEntry(entry: string) {
+  let s = entry.trim();
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  return normalizeUsername(s);
+}
+
 function wordEditorUsernames() {
   const raw = process.env.WORD_EDITOR_USERNAMES ?? "";
   return new Set(
     raw
       .split(",")
-      .map((s) => s.trim())
+      .map(parseEditorEntry)
       .filter(Boolean)
   );
 }
 
 function canEditWords(username: string | undefined) {
   if (!username) return false;
-  return wordEditorUsernames().has(username);
+  return wordEditorUsernames().has(normalizeUsername(username));
 }
 
 function requireWordEditor(
@@ -188,7 +205,12 @@ function requireWordEditor(
 }
 
 app.post("/login", passport.authenticate("local"), (req: IGetUserAuthInfoRequest, res) => {
-  res.json({ message: "Successful login", username: sessionUsername(req) });
+  const username = sessionUsername(req);
+  res.json({
+    message: "Successful login",
+    username,
+    canEditWords: canEditWords(username),
+  });
 });
 
 app.get("/me", (req: IGetUserAuthInfoRequest, res) => {
@@ -197,7 +219,17 @@ app.get("/me", (req: IGetUserAuthInfoRequest, res) => {
     res.status(401).json({ message: "Not authenticated" });
     return;
   }
-  res.json({ username, canEditWords: canEditWords(username) });
+  const allowed = canEditWords(username);
+  if (!allowed && wordEditorUsernames().size > 0) {
+    console.warn(
+      `Word editor access denied for ${JSON.stringify(username)} (${wordEditorUsernames().size} editor(s) configured)`
+    );
+  }
+  res.json({
+    username,
+    canEditWords: allowed,
+    wordCatalogAdminEnabled: true,
+  });
 });
 
 app.post("/register", async (req, res) => {
@@ -709,5 +741,14 @@ app.delete("/diary", requireAuth, async (req: IGetUserAuthInfoRequest, res) => {
 });
 
 app.listen(8080, () => {
+  const editorCount = wordEditorUsernames().size;
   console.log("Server is listening on port 8080");
+  console.log(
+    `Word catalog editors: ${editorCount} account(s) from WORD_EDITOR_USERNAMES`
+  );
+  if (editorCount === 0) {
+    console.warn(
+      "WORD_EDITOR_USERNAMES is empty; no accounts can edit the global word bank."
+    );
+  }
 });

@@ -55,7 +55,8 @@ function wordToForm(w: CatalogWord): CatalogWord {
 }
 
 export default function AdminWordsPage() {
-  const { username, canEditWords } = useSession();
+  const { username, canEditWords, wordCatalogAdminEnabled, refreshSession } =
+    useSession();
   const [page, setPage] = useState(1);
   const [limit] = useState(25);
   const [query, setQuery] = useState("");
@@ -185,13 +186,31 @@ export default function AdminWordsPage() {
         <div className="card-surface mx-auto max-w-lg px-8 py-12 text-center text-violet-300/80">
           <p className="font-medium text-violet-100">Access restricted</p>
           <p className="mt-3 text-sm leading-relaxed">
-            Your account is not allowed to edit the global word bank. Add your
-            username to the{" "}
+            Signed in as{" "}
+            <code className="rounded bg-violet-950/80 px-1.5 py-0.5 text-violet-100">
+              {username}
+            </code>
+            . That exact string must appear in{" "}
             <code className="rounded bg-violet-950/80 px-1.5 py-0.5 text-violet-200">
               WORD_EDITOR_USERNAMES
             </code>{" "}
-            environment variable on the API server, then sign in again.
+            on the Railway backend service (not the frontend), then redeploy and
+            sign in again.
           </p>
+          {!wordCatalogAdminEnabled && (
+            <p className="mt-4 text-sm leading-relaxed text-amber-200/90">
+              The API does not look updated yet (missing word-bank admin). Redeploy
+              the backend from the latest <code className="text-amber-100">main</code>{" "}
+              commit on GitHub, then try again.
+            </p>
+          )}
+          <button
+            type="button"
+            className="btn-secondary mt-6"
+            onClick={() => refreshSession()}
+          >
+            Re-check access
+          </button>
         </div>
       </div>
     );
