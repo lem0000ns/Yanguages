@@ -11,6 +11,7 @@ import {
   LogIn,
   LogOut,
   Menu,
+  Settings2,
   User,
   X,
 } from "lucide-react";
@@ -120,7 +121,7 @@ function AccountPanel({ compact }: { compact?: boolean }) {
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { username, refreshSession } = useSession();
+  const { username, canEditWords, refreshSession } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -153,6 +154,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               active={isActive(item.href)}
             />
           ))}
+          {canEditWords && (
+            <NavItem
+              href="/admin/words"
+              label="Word bank"
+              icon={Settings2}
+              active={isActive("/admin/words")}
+            />
+          )}
         </nav>
 
         <div className="border-t border-border-subtle p-4">
@@ -207,6 +216,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   {item.label}
                 </Link>
               ))}
+              {canEditWords && (
+                <Link
+                  href="/admin/words"
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-xl px-4 py-3 ${
+                    isActive("/admin/words")
+                      ? "nav-link-active"
+                      : "text-violet-200/80"
+                  }`}
+                >
+                  Word bank
+                </Link>
+              )}
             </nav>
             <div className="mt-4 border-t border-border-subtle pt-4">
               <AccountPanel compact />

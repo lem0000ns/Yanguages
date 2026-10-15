@@ -7,9 +7,17 @@ export function apiFetch(path: string, init: RequestInit = {}) {
   });
 }
 
-export async function fetchSession() {
+export type SessionInfo = {
+  username: string;
+  canEditWords: boolean;
+};
+
+export async function fetchSession(): Promise<SessionInfo> {
   const res = await apiFetch("/me");
-  if (!res.ok) return "";
+  if (!res.ok) return { username: "", canEditWords: false };
   const data = await res.json();
-  return typeof data.username === "string" ? data.username : "";
+  return {
+    username: typeof data.username === "string" ? data.username : "",
+    canEditWords: Boolean(data.canEditWords),
+  };
 }

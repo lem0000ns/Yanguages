@@ -153,6 +153,40 @@ function requireAuth(
   next();
 }
 
+const WORD_DIFFS = new Set(["easy", "med", "hard"]);
+
+function wordEditorUsernames() {
+  const raw = process.env.WORD_EDITOR_USERNAMES ?? "";
+  return new Set(
+    raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+}
+
+function canEditWords(username: string | undefined) {
+  if (!username) return false;
+  return wordEditorUsernames().has(username);
+}
+
+function requireWordEditor(
+  req: IGetUserAuthInfoRequest,
+  res: Response,
+  next: NextFunction
+) {
+  const username = sessionUsername(req);
+  if (!username) {
+    res.status(401).json({ message: "Not authenticated" });
+    return;
+  }
+  if (!canEditWords(username)) {
+    res.status(403).json({ message: "Not authorized to edit the word catalog" });
+    return;
+  }
+  next();
+}
+
 app.post("/login", passport.authenticate("local"), (req: IGetUserAuthInfoRequest, res) => {
   res.json({ message: "Successful login", username: sessionUsername(req) });
 });
@@ -163,7 +197,7 @@ app.get("/me", (req: IGetUserAuthInfoRequest, res) => {
     res.status(401).json({ message: "Not authenticated" });
     return;
   }
-  res.json({ username });
+  res.json({ username, canEditWords: canEditWords(username) });
 });
 
 app.post("/register", async (req, res) => {
@@ -194,7 +228,21 @@ app.get("/logout", (req: IGetUserAuthInfoRequest, res, next) => {
 });
 
 interface Word extends RowDataPacket {
+  id?: number;
   english: string;
+  diff?: string | null;
+  freq?: number | null;
+  pronunciation?: string | null;
+  spanish?: string | null;
+  korean?: string | null;
+  chinese?: string | null;
+  pinyin?: string | null;
+  def?: string | null;
+}
+
+function optionalString(value: unknown): string | null {
+  if (value == null || value === "") return null;
+  return String(value);
 }
 
 interface Score extends RowDataPacket {
@@ -267,6 +315,133 @@ app.get("/api/options/easy", (req, res) => getOptions("easy", res));
 app.get("/api/options/med", (req, res) => getOptions("med", res));
 app.get("/api/options/hard", (req, res) => getOptions("hard", res));
 app.get("/api/word", (req, res) => getAPIword("", res));
+
+app.get("/admin/words", requireWordEditor, async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(String(req.query.page ?? "1"), 10) || 1);
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(String(req.query.limit ?? "25"), 10) || 25)
+    );
+    const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+    const diff =
+      typeof req.query.diff === "string" ? req.query.diff.trim() : "";
+
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
+    if (q) {
+      conditions.push("(english LIKE ? OR def LIKE ?)");
+      const like = `%${q}%`;
+      params.push(like, like);
+    }
+    if (diff && WORD_DIFFS.has(diff)) {
+      conditions.push("diff = ?");
+      params.push(diff);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+    const offset = (page - 1) * limit;
+
+    const [countRows] = await lld_pool.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS total FROM words ${where}`,
+      params
+    );
+    const total = Number(countRows[0]?.total ?? 0);
+
+    const [items] = await lld_pool.query<Word[]>(
+      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, def
+       FROM words ${where}
+       ORDER BY id ASC
+       LIMIT ? OFFSET ?`,
+      [...params, limit, offset]
+    );
+
+    res.json({
+      items,
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    });
+  } catch (error) {
+    console.error("Error listing words for admin:", error);
+    res.status(500).json({ message: "Error listing words" });
+  }
+});
+
+app.put("/admin/words/:id", requireWordEditor, async (req, res) => {
+  const id = parseInt(String(req.params.id), 10);
+  if (!Number.isFinite(id)) {
+    res.status(400).json({ message: "Invalid word id" });
+    return;
+  }
+
+  const {
+    english,
+    diff,
+    freq,
+    pronunciation,
+    spanish,
+    korean,
+    chinese,
+    pinyin,
+    def,
+  } = req.body ?? {};
+
+  if (typeof english !== "string" || !english.trim()) {
+    res.status(400).json({ message: "english is required" });
+    return;
+  }
+
+  let diffVal: string | null =
+    diff == null || diff === "" ? null : String(diff);
+  if (diffVal != null && !WORD_DIFFS.has(diffVal)) {
+    res.status(400).json({ message: "diff must be easy, med, or hard" });
+    return;
+  }
+
+  let freqVal: number | null =
+    freq == null || freq === "" ? null : Number(freq);
+  if (freqVal != null && !Number.isFinite(freqVal)) {
+    res.status(400).json({ message: "freq must be a number" });
+    return;
+  }
+
+  try {
+    const [result] = await lld_pool.query(
+      `UPDATE words SET english = ?, diff = ?, freq = ?, pronunciation = ?, spanish = ?, korean = ?, chinese = ?, pinyin = ?, def = ?
+       WHERE id = ?`,
+      [
+        english.trim(),
+        diffVal,
+        freqVal,
+        optionalString(pronunciation),
+        optionalString(spanish),
+        optionalString(korean),
+        optionalString(chinese),
+        optionalString(pinyin),
+        optionalString(def),
+        id,
+      ]
+    );
+
+    const affected = (result as { affectedRows?: number }).affectedRows ?? 0;
+    if (affected === 0) {
+      res.status(404).json({ message: "Word not found" });
+      return;
+    }
+
+    const [rows] = await lld_pool.query<Word[]>(
+      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, def FROM words WHERE id = ?`,
+      [id]
+    );
+    res.json({ item: rows[0] });
+  } catch (error) {
+    console.error("Error updating word:", error);
+    res.status(500).json({ message: "Error updating word" });
+  }
+});
 
 const SCORE_LANGS = new Set(["sp", "kr", "zh"]);
 const SCORE_DIFFS = new Set(["easy", "med", "hard"]);
