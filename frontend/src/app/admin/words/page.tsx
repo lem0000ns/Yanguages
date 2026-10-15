@@ -8,7 +8,7 @@ import { useSession } from "../../useSession";
 import DifficultyLabel from "../../ui/DifficultyLabel";
 
 type CatalogWord = {
-  id: number;
+  id: number | null;
   english: string;
   diff: string | null;
   freq: number | null;
@@ -66,6 +66,7 @@ export default function AdminWordsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState<CatalogWord | null>(null);
+  const [editingKeyEnglish, setEditingKeyEnglish] = useState("");
   const [form, setForm] = useState<CatalogWord>(emptyForm());
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
@@ -112,12 +113,14 @@ export default function AdminWordsPage() {
 
   const openEdit = (word: CatalogWord) => {
     setEditing(word);
+    setEditingKeyEnglish(word.english);
     setForm(wordToForm(word));
     setSaveMessage("");
   };
 
   const closeEdit = () => {
     setEditing(null);
+    setEditingKeyEnglish("");
     setForm(emptyForm());
     setSaveMessage("");
   };
@@ -128,21 +131,32 @@ export default function AdminWordsPage() {
     setSaving(true);
     setSaveMessage("");
     try {
-      const res = await apiFetch(`/admin/words/${editing.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          english: form.english,
-          diff: form.diff,
-          freq: form.freq,
-          pronunciation: form.pronunciation,
-          spanish: form.spanish,
-          korean: form.korean,
-          chinese: form.chinese,
-          pinyin: form.pinyin,
-          def: form.def,
-        }),
-      });
+      const payload = {
+        english: form.english,
+        diff: form.diff,
+        freq: form.freq,
+        pronunciation: form.pronunciation,
+        spanish: form.spanish,
+        korean: form.korean,
+        chinese: form.chinese,
+        pinyin: form.pinyin,
+        def: form.def,
+      };
+      const res =
+        editing.id != null && editing.id > 0
+          ? await apiFetch(`/admin/words/${editing.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            })
+          : await apiFetch("/admin/words", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...payload,
+                originalEnglish: editingKeyEnglish,
+              }),
+            });
       const body = await res.json();
       if (!res.ok) {
         setSaveMessage(body.message ?? "Save failed");
@@ -154,11 +168,20 @@ export default function AdminWordsPage() {
         prev
           ? {
               ...prev,
-              items: prev.items.map((w) => (w.id === updated.id ? updated : w)),
+              items: prev.items.map((w) =>
+                w.id != null && updated.id != null
+                  ? w.id === updated.id
+                    ? updated
+                    : w
+                  : w.english === editingKeyEnglish
+                    ? updated
+                    : w
+              ),
             }
           : prev
       );
       setEditing(updated);
+      setEditingKeyEnglish(updated.english);
       setForm(wordToForm(updated));
     } catch {
       setSaveMessage("Save failed");
@@ -317,7 +340,7 @@ export default function AdminWordsPage() {
               {!loading &&
                 data?.items.map((word) => (
                   <tr
-                    key={word.id}
+                    key={word.id ?? word.english}
                     className="border-b border-border-subtle/60 transition-colors hover:bg-violet-950/20"
                   >
                     <td className="px-4 py-3">
@@ -408,8 +431,10 @@ export default function AdminWordsPage() {
           <div className="overlay" onClick={closeEdit} role="presentation" />
           <div className="modal-content flex max-h-[min(90vh,720px)] flex-col overflow-y-auto">
             <h2 className="font-display text-xl font-semibold">
-              Edit word{" "}
-              <span className="text-violet-400">#{editing.id}</span>
+              Edit{" "}
+              <span className="text-violet-400">
+                {editing.id != null ? `#${editing.id}` : editingKeyEnglish}
+              </span>
             </h2>
             <form className="mt-4 space-y-4" onSubmit={handleSave}>
               <div className="grid gap-4 sm:grid-cols-2">

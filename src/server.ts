@@ -277,6 +277,110 @@ function optionalString(value: unknown): string | null {
   return String(value);
 }
 
+let wordsTableHasIdCache: boolean | null = null;
+
+async function wordsTableHasIdColumn() {
+  if (wordsTableHasIdCache != null) return wordsTableHasIdCache;
+  try {
+    const [rows] = await lld_pool.query<RowDataPacket[]>(
+      "SHOW COLUMNS FROM words LIKE 'id'"
+    );
+    wordsTableHasIdCache = rows.length > 0;
+  } catch {
+    wordsTableHasIdCache = false;
+  }
+  return wordsTableHasIdCache;
+}
+
+const WORD_ROW_COLUMNS =
+  "english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, `def`";
+
+type WordUpdatePayload = {
+  english: string;
+  diff: string | null;
+  freq: number | null;
+  pronunciation: string | null;
+  spanish: string | null;
+  korean: string | null;
+  chinese: string | null;
+  pinyin: string | null;
+  def: string | null;
+};
+
+function parseWordUpdateBody(body: unknown):
+  | { ok: true; data: WordUpdatePayload }
+  | { ok: false; message: string } {
+  const b = (body ?? {}) as Record<string, unknown>;
+  const english = b.english;
+  if (typeof english !== "string" || !english.trim()) {
+    return { ok: false, message: "english is required" };
+  }
+
+  let diffVal: string | null =
+    b.diff == null || b.diff === "" ? null : String(b.diff);
+  if (diffVal != null && !WORD_DIFFS.has(diffVal)) {
+    return { ok: false, message: "diff must be easy, med, or hard" };
+  }
+
+  let freqVal: number | null =
+    b.freq == null || b.freq === "" ? null : Number(b.freq);
+  if (freqVal != null && !Number.isFinite(freqVal)) {
+    return { ok: false, message: "freq must be a number" };
+  }
+
+  return {
+    ok: true,
+    data: {
+      english: english.trim(),
+      diff: diffVal,
+      freq: freqVal,
+      pronunciation: optionalString(b.pronunciation),
+      spanish: optionalString(b.spanish),
+      korean: optionalString(b.korean),
+      chinese: optionalString(b.chinese),
+      pinyin: optionalString(b.pinyin),
+      def: optionalString(b.def),
+    },
+  };
+}
+
+function wordUpdateSqlValues(data: WordUpdatePayload) {
+  return [
+    data.english,
+    data.diff,
+    data.freq,
+    data.pronunciation,
+    data.spanish,
+    data.korean,
+    data.chinese,
+    data.pinyin,
+    data.def,
+  ];
+}
+
+async function fetchWordRowById(id: number) {
+  const hasId = await wordsTableHasIdColumn();
+  if (!hasId) return null;
+  const [rows] = await lld_pool.query<Word[]>(
+    `SELECT id, ${WORD_ROW_COLUMNS} FROM words WHERE id = ?`,
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+async function fetchWordRowByEnglish(english: string) {
+  const hasId = await wordsTableHasIdColumn();
+  const cols = hasId ? `id, ${WORD_ROW_COLUMNS}` : WORD_ROW_COLUMNS;
+  const [rows] = await lld_pool.query<Word[]>(
+    `SELECT ${cols} FROM words WHERE english = ?`,
+    [english]
+  );
+  const row = rows[0];
+  if (!row) return null;
+  if (!hasId) return { ...row, id: null as number | null };
+  return row;
+}
+
 interface Score extends RowDataPacket {
   sp_easy: number;
   sp_med: number;
@@ -363,7 +467,7 @@ app.get("/admin/words", requireWordEditor, async (req, res) => {
     const params: unknown[] = [];
 
     if (q) {
-      conditions.push("(english LIKE ? OR def LIKE ?)");
+      conditions.push("(english LIKE ? OR `def` LIKE ?)");
       const like = `%${q}%`;
       params.push(like, like);
     }
@@ -380,15 +484,22 @@ app.get("/admin/words", requireWordEditor, async (req, res) => {
       params
     );
     const total = Number(countRows[0]?.total ?? 0);
+    const hasId = await wordsTableHasIdColumn();
+    const selectCols = hasId ? `id, ${WORD_ROW_COLUMNS}` : WORD_ROW_COLUMNS;
+    const orderBy = hasId ? "id ASC" : "english ASC";
 
     // LIMIT/OFFSET cannot use prepared placeholders on many MySQL setups.
-    const [items] = await lld_pool.query<Word[]>(
-      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, \`def\`
+    const [rows] = await lld_pool.query<Word[]>(
+      `SELECT ${selectCols}
        FROM words ${where}
-       ORDER BY id ASC
+       ORDER BY ${orderBy}
        LIMIT ${limit} OFFSET ${offset}`,
       params
     );
+
+    const items = hasId
+      ? rows
+      : rows.map((row) => ({ ...row, id: null as number | null }));
 
     res.json({
       items,
@@ -396,12 +507,48 @@ app.get("/admin/words", requireWordEditor, async (req, res) => {
       limit,
       total,
       totalPages: Math.max(1, Math.ceil(total / limit)),
+      rowKey: hasId ? "id" : "english",
     });
   } catch (error) {
     console.error("Error listing words for admin:", error);
     const detail =
       error instanceof Error ? error.message : String(error);
     res.status(500).json({ message: "Error listing words", detail });
+  }
+});
+
+app.put("/admin/words", requireWordEditor, async (req, res) => {
+  const originalEnglish = (req.body as { originalEnglish?: unknown })
+    ?.originalEnglish;
+  if (typeof originalEnglish !== "string" || !originalEnglish.trim()) {
+    res.status(400).json({ message: "originalEnglish is required" });
+    return;
+  }
+
+  const parsed = parseWordUpdateBody(req.body);
+  if (parsed.ok === false) {
+    res.status(400).json({ message: parsed.message });
+    return;
+  }
+
+  try {
+    const [result] = await lld_pool.query(
+      `UPDATE words SET english = ?, diff = ?, freq = ?, pronunciation = ?, spanish = ?, korean = ?, chinese = ?, pinyin = ?, \`def\` = ?
+       WHERE english = ?`,
+      [...wordUpdateSqlValues(parsed.data), originalEnglish.trim()]
+    );
+
+    const affected = (result as { affectedRows?: number }).affectedRows ?? 0;
+    if (affected === 0) {
+      res.status(404).json({ message: "Word not found" });
+      return;
+    }
+
+    const item = await fetchWordRowByEnglish(parsed.data.english);
+    res.json({ item });
+  } catch (error) {
+    console.error("Error updating word:", error);
+    res.status(500).json({ message: "Error updating word" });
   }
 });
 
@@ -412,53 +559,26 @@ app.put("/admin/words/:id", requireWordEditor, async (req, res) => {
     return;
   }
 
-  const {
-    english,
-    diff,
-    freq,
-    pronunciation,
-    spanish,
-    korean,
-    chinese,
-    pinyin,
-    def,
-  } = req.body ?? {};
-
-  if (typeof english !== "string" || !english.trim()) {
-    res.status(400).json({ message: "english is required" });
-    return;
-  }
-
-  let diffVal: string | null =
-    diff == null || diff === "" ? null : String(diff);
-  if (diffVal != null && !WORD_DIFFS.has(diffVal)) {
-    res.status(400).json({ message: "diff must be easy, med, or hard" });
-    return;
-  }
-
-  let freqVal: number | null =
-    freq == null || freq === "" ? null : Number(freq);
-  if (freqVal != null && !Number.isFinite(freqVal)) {
-    res.status(400).json({ message: "freq must be a number" });
+  const parsed = parseWordUpdateBody(req.body);
+  if (parsed.ok === false) {
+    res.status(400).json({ message: parsed.message });
     return;
   }
 
   try {
+    const hasId = await wordsTableHasIdColumn();
+    if (!hasId) {
+      res.status(400).json({
+        message:
+          "This database has no words.id column; use PUT /admin/words with originalEnglish",
+      });
+      return;
+    }
+
     const [result] = await lld_pool.query(
-      `UPDATE words SET english = ?, diff = ?, freq = ?, pronunciation = ?, spanish = ?, korean = ?, chinese = ?, pinyin = ?, def = ?
+      `UPDATE words SET english = ?, diff = ?, freq = ?, pronunciation = ?, spanish = ?, korean = ?, chinese = ?, pinyin = ?, \`def\` = ?
        WHERE id = ?`,
-      [
-        english.trim(),
-        diffVal,
-        freqVal,
-        optionalString(pronunciation),
-        optionalString(spanish),
-        optionalString(korean),
-        optionalString(chinese),
-        optionalString(pinyin),
-        optionalString(def),
-        id,
-      ]
+      [...wordUpdateSqlValues(parsed.data), id]
     );
 
     const affected = (result as { affectedRows?: number }).affectedRows ?? 0;
@@ -467,11 +587,8 @@ app.put("/admin/words/:id", requireWordEditor, async (req, res) => {
       return;
     }
 
-    const [rows] = await lld_pool.query<Word[]>(
-      `SELECT id, english, diff, freq, pronunciation, spanish, korean, chinese, pinyin, \`def\` FROM words WHERE id = ?`,
-      [id]
-    );
-    res.json({ item: rows[0] });
+    const item = await fetchWordRowById(id);
+    res.json({ item });
   } catch (error) {
     console.error("Error updating word:", error);
     res.status(500).json({ message: "Error updating word" });
